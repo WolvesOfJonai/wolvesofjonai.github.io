@@ -1,2 +1,0 @@
-
-# Wolves Of Jonai readme
