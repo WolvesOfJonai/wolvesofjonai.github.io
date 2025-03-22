@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+<meta name="keywords" content="{{ site.keywords }}">
+  {% if page.robots %}
+<meta name="robots" content="{{page.robots}},follow" />
+  {% else %}  
+<meta name="robots" content="index,follow" />
+  {% endif %}
+<meta name="rating" content="{{ site.settings.rating }}">
+    
+<!-- Add to homescreen for Chrome on Android -->
+<meta name="mobile-web-app-capable" content="yes">
+
+<!-- Add to homescreen for Safari on iOS -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="{{ site.h1title }}">
+
+<!-- favicons -->
+<link rel="shortcut icon" type="image/png" href="{{ "/assets/icon/favicon-32x32.png" | prepend: site.baseurl }}">
+
+<!-- CSS & Fonts Preload -->
+<link href="http://fonts.googleapis.com/css?family=Orbitron:400" rel="stylesheet" type="text/css" />
+
+<!-- CSS -->
+<noscript><link rel="stylesheet" href="{{ site.baseurl }}/assets/css/noscript.css" /></noscript>
+
+{% seo %}
+  
+<!-- Custom CSS -->
+  <style type="text/css">
+  #systemDetails,
+  #hud {
+    width: 40%;
+    max-width: 450px;
+  }
+  #edmap {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+  }
+  </style>
+</head>
+<body>
+  <div id="edmap"></div>
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+  <!-- Three.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r75/three.min.js"></script>
+
+  <!-- Launch ED3Dmap -->
+  <link href="css/styles.css" rel="stylesheet" type="text/css" />
+  <script src="js/ed3dmap.min.js?v=5"></script>
+  <script type="text/javascript">
+    Promise.all([
+        fetch("./json_files/mainsystems.json").then(res => res.json()),
+        fetch("./json_files/othersystems.json").then(res => res.json())
+    ]).then(([data1, data2]) => {
+        // Merge categories (combining keys from both files)
+        const mergedCategories = { ...data1.categories, ...data2.categories };
+
+        // Merge systems by concatenating arrays
+        const mergedSystems = [...data1.systems, ...data2.systems];
+
+        // Create final merged JSON
+        const mergedData = {
+            categories: mergedCategories,
+            systems: mergedSystems
+        };
+
+        // Create a Blob URL for the merged JSON
+        const blob = new Blob([JSON.stringify(mergedData)], { type: "application/json" });
+        const blobURL = URL.createObjectURL(blob);
+
+        // Initialize Ed3d with the dynamically created JSON URL
+        Ed3d.init({
+            container   : 'edmap',
+            jsonPath    : blobURL, // Use Blob URL instead of a static file
+            withHudPanel : true,
+            withOptionsPanel : true,
+            hudMultipleSelect : true,
+            effectScaleSystem : [10,1000],
+            startAnim: true,
+            systemColor: '#eee',
+            starSprite: "textures/lensflare/star_grey.png",
+            playerPos: [-99.8125,18.09375,86.40625], 
+            showNameNear: false
+        });
+    }).catch(err => console.error("Error loading JSON files:", err));
+  </script>
+</body>
+</html>

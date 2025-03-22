@@ -93,6 +93,7 @@ var HUD = {
         $(this).toggleClass('active');
       })
       .appendTo( "#options" );
+      
 
     //-- Toggle Grid
     $( "<a></a>" )

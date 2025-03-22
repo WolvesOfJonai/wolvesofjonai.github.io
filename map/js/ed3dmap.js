@@ -88,7 +88,7 @@ var Ed3d = {
   'systemColor'         : '#eeeeee',
 
   //-- HUD
-  'withHudPanel'        : false,
+  'withHudPanel'        : true,
   'withOptionsPanel'    : true,
   'hudMultipleSelect'   : true,
 
