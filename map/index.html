@@ -33,23 +33,11 @@
 {% seo %}
   
 <!-- Custom CSS -->
-  <style type="text/css">
-  #systemDetails,
-  #hud {
-    width: 40%;
-    max-width: 450px;
-  }
-  #edmap {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 100%;
-    height: 100%;
-  }
-  </style>
+<link href="css/styles.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
   <div id="edmap"></div>
+  <button id="toggle-ui-btn">Toggle UI</button>
   <!-- jQuery -->
   <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
   <!-- Three.js -->
@@ -86,6 +74,7 @@
             withHudPanel : true,
             withOptionsPanel : true,
             hudMultipleSelect : true,
+            withFullscreenToggle : false,
             effectScaleSystem : [10,1000],
             startAnim: true,
             systemColor: '#eee',
@@ -95,5 +84,19 @@
         });
     }).catch(err => console.error("Error loading JSON files:", err));
   </script>
+
+<script>
+  // Add functionality to toggle the UI
+  document.getElementById('toggle-ui-btn').addEventListener('click', () => {
+    const hud = document.getElementById('hud');
+    const systemDetails = document.getElementById('systemDetails');
+
+    if (hud && systemDetails) {
+      const isHidden = hud.style.visibility === 'hidden';
+      hud.style.visibility = isHidden ? 'visible' : 'hidden';
+      systemDetails.style.visibility = isHidden ? 'visible' : 'hidden';
+    }
+  });
+</script>
 </body>
 </html>

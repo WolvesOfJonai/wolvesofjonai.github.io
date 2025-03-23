@@ -1,7 +1,5 @@
-
-
 body {
-  background-color: #0a0a0a;
+  background-color: #282828;
   margin: 0;
 }
 
@@ -453,4 +451,44 @@ body {
 }
 .d1 {
   animation-delay: 39.47368421ms;
+}
+
+#systemDetails,
+#hud {
+  width: 40%;
+  max-width: 450px;
+}
+
+#edmap {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Style for the toggle button */
+#toggle-ui-btn {
+  position: fixed;
+  bottom: 10px; /* Position the button 10px from the bottom */
+  left: 10px;   /* Position the button 10px from the left */
+  z-index: 1000;
+  padding: 10px 20px;
+  background-color: #333;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+#toggle-ui-btn:hover {
+  background-color: #555;
+  transform: scale(1.05);
+}
+
+#toggle-ui-btn:active {
+  background-color: #222;
 }
