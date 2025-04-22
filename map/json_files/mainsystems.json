@@ -1,8 +1,8 @@
 {"categories":{
     "Wolves of Jonai":{
         "0":{"name":"Wolves Of Jonai - Home","color":"007eff"},
-        "1":{"name":"Controlled Before Colonisation","color":"4c8bff"},
-        "2":{"name":"Present in After Colonisation","color":"8a7bff"}},
+        "1":{"name":"Normal Expansions non Colonisation","color":"4c8bff"},
+        "2":{"name":"Expansion with Colonisation","color":"8a7bff"}},
 
     "Points of Intrests":{ 
         "6":{"name":"SOL","color":"ff6000"},
