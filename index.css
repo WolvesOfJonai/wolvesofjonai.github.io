@@ -554,13 +554,13 @@ body {
       rgba(10, 10, 10, 0.3),
       rgb(10, 10, 10, 1)
     ),
-    url("https://i.imgur.com/d3DIyh1.png");
+    url("https://wolvesofjonai.github.io/Images/Discord_Embeds/d3DIyh1.png");
   --background-background: linear-gradient(
       0deg,
       rgba(10, 10, 10, 1),
       rgba(10, 10, 10, 0.6)
     ),
-    url("https://i.imgur.com/d3DIyh1.png") center center fixed;
+    url("https://wolvesofjonai.github.io/Images/Discord_Embeds/d3DIyh1.png") center center fixed;
   --height: 50vh;
 }
 
@@ -591,6 +591,6 @@ body {
         rgba(10, 10, 10, 1),
         rgba(10, 10, 10, 0)
       ),
-      url("https://i.imgur.com/d3DIyh1.png") !important;
+      url("https://wolvesofjonai.github.io/Images/Discord_Embeds/d3DIyh1.png") !important;
   }
 }
