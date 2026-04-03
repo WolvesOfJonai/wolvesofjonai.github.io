@@ -9,6 +9,7 @@ Alrai Sector JC-V c2-28
 Alrai Sector OY-R b4-1
 Alrai Sector PT-R b4-5
 Alrai Sector PT-R b4-8
+Alrai Sector FW-W c1-25
 Anali
 Antanyamai
 Arawegali
@@ -100,7 +101,6 @@ Ither
 Itzambivat
 Jaadwadlia
 Jadlili
-Jakab
 Jala
 Jian Yu
 Jingones
