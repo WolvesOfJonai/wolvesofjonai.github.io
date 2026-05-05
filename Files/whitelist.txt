@@ -5,6 +5,7 @@ Airs
 Akba Atacab
 Allowa
 Alrai Sector CB-O a6-3
+Alrai Sector DB-O a6-3
 Alrai Sector HR-W c1-13
 Alrai Sector JC-V c2-28
 Alrai Sector OY-R b4-1
