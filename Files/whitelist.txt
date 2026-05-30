@@ -50,6 +50,7 @@ Col 285 Sector ID-I c10-6
 Col 285 Sector KY-H c10-20
 Col 285 Sector KY-H c10-26
 Col 285 Sector OE-G c11-13
+Col 285 Sector WH-O b21-6
 Comana
 Cuagsa
 Cupis
