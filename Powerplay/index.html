@@ -225,6 +225,8 @@
       padding: 7px 10px;
       font-size: 0.95rem;
       color: var(--accent-color);
+      width: 100%;
+      box-sizing: border-box;
     }
 
     .settings-footer {
@@ -268,6 +270,39 @@
 
     .result-item:last-child {
       border-bottom: none;
+    }
+
+    /* ── Split Section ── */
+    .split-section {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-color);
+    }
+    .split-section label {
+      margin-bottom: 0;
+      font-size: 0.85rem;
+      color: var(--muted-color);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .split-section input {
+      width: 70px;
+      padding: 6px;
+      text-align: center;
+      background-color: var(--input-bg);
+      border: 1px solid var(--border-color);
+      color: var(--accent-color);
+      border-radius: 4px;
+      font-weight: bold;
+      -moz-appearance: textfield;
+    }
+    .split-section input::-webkit-outer-spin-button,
+    .split-section input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
     }
 
     .result-label {
@@ -549,15 +584,32 @@
             <input type="number" id="invAssociation" min="0" step="1" placeholder="0">
           </div>
           <div class="merit-field">
+            <label for="invPolitical">Political Data</label>
+            <input type="number" id="invPolitical" min="0" step="1" placeholder="0">
+          </div>
+          <div class="merit-field">
             <label for="invResearch">Research Data</label>
             <input type="number" id="invResearch" min="0" step="1" placeholder="0">
           </div>
           <div class="merit-field">
-            <label for="invCommodity">Power Commodities</label>
+            <label for="invIndustrial">Industrial Data</label>
+            <input type="number" id="invIndustrial" min="0" step="1" placeholder="0">
+          </div>
+          <div class="merit-field">
+            <label for="invCommodity">Power Goods from boxes</label>
             <input type="number" id="invCommodity" min="0" step="1" placeholder="0">
           </div>
         </div>
+        <div class="settings-footer">
+          <button class="reset-btn" id="clearInventory">&#10005; Clear Inventory</button>
+        </div>
       </div>
+    </div>
+
+    <!-- Split Goal -->
+    <div class="split-section">
+      <label for="numCmdrs">Split between how many CMDRs?</label>
+      <input type="number" id="numCmdrs" min="1" step="1" value="1">
     </div>
 
     <!-- Results -->
@@ -667,10 +719,15 @@
     }
 
     function getInventory() {
+      var assoc = (parseInt(document.getElementById('invAssociation').value, 10) || 0) +
+                  (parseInt(document.getElementById('invPolitical').value, 10) || 0);
+      var res =   (parseInt(document.getElementById('invResearch').value, 10) || 0) +
+                  (parseInt(document.getElementById('invIndustrial').value, 10) || 0);
+
       return {
         classified:  parseInt(document.getElementById('invClassified').value,  10) || 0,
-        association: parseInt(document.getElementById('invAssociation').value, 10) || 0,
-        research:    parseInt(document.getElementById('invResearch').value,    10) || 0,
+        association: assoc,
+        research:    res,
         commodity:   parseInt(document.getElementById('invCommodity').value,   10) || 0,
       };
     }
@@ -747,10 +804,14 @@
         document.getElementById('remainingReadout').style.display = 'none';
       }
 
-      document.getElementById('resClassified').textContent  = itemsNeeded(remainingScore, eff.classified).toLocaleString()  + ' pieces';
-      document.getElementById('resAssociation').textContent = itemsNeeded(remainingScore, eff.association).toLocaleString() + ' pieces';
-      document.getElementById('resResearch').textContent    = itemsNeeded(remainingScore, eff.research).toLocaleString()    + ' pieces';
-      document.getElementById('resCommodity').textContent   = itemsNeeded(remainingScore, eff.commodity).toLocaleString()   + ' units';
+      var numCmdrs = Math.max(1, parseInt(document.getElementById('numCmdrs').value, 10) || 1);
+      var perCmdrText = numCmdrs > 1 ? ' (each)' : '';
+      var perCmdrRemaining = remainingScore / numCmdrs;
+
+      document.getElementById('resClassified').textContent  = itemsNeeded(perCmdrRemaining, eff.classified).toLocaleString()  + ' pieces' + perCmdrText;
+      document.getElementById('resAssociation').textContent = itemsNeeded(perCmdrRemaining, eff.association).toLocaleString() + ' pieces' + perCmdrText;
+      document.getElementById('resResearch').textContent    = itemsNeeded(perCmdrRemaining, eff.research).toLocaleString()    + ' pieces' + perCmdrText;
+      document.getElementById('resCommodity').textContent   = itemsNeeded(perCmdrRemaining, eff.commodity).toLocaleString()   + ' units' + perCmdrText;
     }
 
     // Score input (manual — clears the state helper)
@@ -798,10 +859,36 @@
       document.getElementById(id).addEventListener('input', calculate);
     });
 
-    // Inventory inputs
-    ['invClassified','invAssociation','invResearch','invCommodity'].forEach(function(id) {
-      document.getElementById(id).addEventListener('input', calculate);
+    // Inventory Auto-Save and Clear
+    function saveInventory() {
+      var inv = {
+        classified: document.getElementById('invClassified').value,
+        association: document.getElementById('invAssociation').value,
+        political: document.getElementById('invPolitical').value,
+        research: document.getElementById('invResearch').value,
+        industrial: document.getElementById('invIndustrial').value,
+        commodity: document.getElementById('invCommodity').value,
+      };
+      localStorage.setItem('ppInventory', JSON.stringify(inv));
+    }
+
+    ['invClassified','invAssociation','invPolitical','invResearch','invIndustrial','invCommodity'].forEach(function(id) {
+      document.getElementById(id).addEventListener('input', function() {
+        saveInventory();
+        calculate();
+      });
     });
+    
+    document.getElementById('clearInventory').addEventListener('click', function() {
+      ['invClassified','invAssociation','invPolitical','invResearch','invIndustrial','invCommodity'].forEach(function(id) {
+        document.getElementById(id).value = '';
+      });
+      saveInventory();
+      calculate();
+    });
+    
+    // Split input
+    document.getElementById('numCmdrs').addEventListener('input', calculate);
 
     // Reset button
     document.getElementById('resetMerits').addEventListener('click', function() {
@@ -854,6 +941,19 @@
         '\u2212' + Math.round((1 - CONFIG.reinforceMultiplier) * 100) + '%';
       document.getElementById('undermineBadge').textContent =
         '+' + Math.round((CONFIG.undermineMultiplier - 1) * 100) + '%';
+
+      // Load saved inventory if it exists
+      try {
+        var savedInv = JSON.parse(localStorage.getItem('ppInventory'));
+        if (savedInv) {
+          if (savedInv.classified !== undefined) document.getElementById('invClassified').value = savedInv.classified;
+          if (savedInv.association !== undefined) document.getElementById('invAssociation').value = savedInv.association;
+          if (savedInv.political !== undefined) document.getElementById('invPolitical').value = savedInv.political;
+          if (savedInv.research !== undefined) document.getElementById('invResearch').value = savedInv.research;
+          if (savedInv.industrial !== undefined) document.getElementById('invIndustrial').value = savedInv.industrial;
+          if (savedInv.commodity !== undefined) document.getElementById('invCommodity').value = savedInv.commodity;
+        }
+      } catch (e) {}
 
       calculate();
     }
