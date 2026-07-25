@@ -600,7 +600,8 @@
             <input type="number" id="invCommodity" min="0" step="1" placeholder="0">
           </div>
         </div>
-        <div class="settings-footer">
+        <div class="settings-footer" style="justify-content: space-between; align-items: center;">
+          <div style="font-size: 0.85rem; color: var(--muted-color);">Total Items: <strong id="invTotalCount" style="color: var(--text-color);">0</strong></div>
           <button class="reset-btn" id="clearInventory">&#10005; Clear Inventory</button>
         </div>
       </div>
@@ -614,8 +615,7 @@
 
     <!-- Results -->
     <div class="results">
-      <div id="remainingReadout" style="font-size: 0.85rem; color: var(--text-color); margin-bottom: 12px; display: none;">
-        Inventory covers <strong id="invCoverage" style="color: var(--accent-color);">0</strong> CP. Remaining: <strong id="remScore" style="color: var(--accent-color);">0</strong> CP.
+      <div id="remainingReadout" style="font-size: 0.85rem; color: var(--text-color); margin-bottom: 12px; display: none; line-height: 1.5;">
       </div>
       <div class="result-item">
         <div>
@@ -644,6 +644,9 @@
           <div class="result-merits" id="labelCommodity"></div>
         </div>
         <span class="result-value" id="resCommodity">—</span>
+      </div>
+      <div style="margin-top: 20px; text-align: center;">
+        <button class="mode-btn" id="btnCopyDiscord" style="width: 100%; max-width: 280px; display: none; border-color: #5865F2; color: #5865F2; background: rgba(88, 101, 242, 0.1);">&#128203; Copy for Discord</button>
       </div>
     </div>
 
@@ -761,6 +764,8 @@
       var m     = getMerits();
       var mult  = getMultiplier();
       var inv   = getInventory();
+      var totalItems = inv.classified + inv.association + inv.research + inv.commodity;
+      document.getElementById('invTotalCount').textContent = totalItems.toLocaleString('en-GB');
 
       // Effective merits after mode multiplier
       var eff = {
@@ -785,6 +790,7 @@
           document.getElementById(id).textContent = '—';
         });
         document.getElementById('remainingReadout').style.display = 'none';
+        document.getElementById('btnCopyDiscord').style.display = 'none';
         return;
       }
 
@@ -796,22 +802,46 @@
 
       var remainingScore = Math.max(0, score - invScore);
 
+      var overallText = 'Total System Target: <strong>' + Math.round(score).toLocaleString('en-GB') + '</strong> CP<br>';
       if (invScore > 0) {
-        document.getElementById('remainingReadout').style.display = 'block';
-        document.getElementById('invCoverage').textContent = Math.round(invScore).toLocaleString('en-GB');
-        document.getElementById('remScore').textContent = Math.round(remainingScore).toLocaleString('en-GB');
-      } else {
-        document.getElementById('remainingReadout').style.display = 'none';
+        overallText += 'Inventory covers: <strong style="color: var(--accent-color);">' + Math.round(invScore).toLocaleString('en-GB') + '</strong> CP<br>';
       }
+      overallText += 'Remaining Goal: <strong>' + Math.round(remainingScore).toLocaleString('en-GB') + '</strong> CP';
 
       var numCmdrs = Math.max(1, parseInt(document.getElementById('numCmdrs').value, 10) || 1);
       var perCmdrText = numCmdrs > 1 ? ' (each)' : '';
       var perCmdrRemaining = remainingScore / numCmdrs;
 
+      if (numCmdrs > 1) {
+        overallText += '<br>Goal per CMDR: <strong style="color: var(--accent-color);">' + Math.round(perCmdrRemaining).toLocaleString('en-GB') + '</strong> CP';
+      }
+
+      var readoutEl = document.getElementById('remainingReadout');
+      readoutEl.innerHTML = overallText;
+      readoutEl.style.display = 'block';
+
       document.getElementById('resClassified').textContent  = itemsNeeded(perCmdrRemaining, eff.classified).toLocaleString()  + ' pieces' + perCmdrText;
       document.getElementById('resAssociation').textContent = itemsNeeded(perCmdrRemaining, eff.association).toLocaleString() + ' pieces' + perCmdrText;
       document.getElementById('resResearch').textContent    = itemsNeeded(perCmdrRemaining, eff.research).toLocaleString()    + ' pieces' + perCmdrText;
       document.getElementById('resCommodity').textContent   = itemsNeeded(perCmdrRemaining, eff.commodity).toLocaleString()   + ' units' + perCmdrText;
+      
+      document.getElementById('btnCopyDiscord').style.display = 'inline-block';
+      
+      window.discordCopyText = "**Powerplay Target**\n" +
+        "Total System Target: " + Math.round(score).toLocaleString('en-GB') + " CP\n";
+      if (invScore > 0) {
+        window.discordCopyText += "Inventory Coverage: " + Math.round(invScore).toLocaleString('en-GB') + " CP\n";
+      }
+      window.discordCopyText += "Remaining Goal: " + Math.round(remainingScore).toLocaleString('en-GB') + " CP\n";
+      if (numCmdrs > 1) {
+        window.discordCopyText += "\nSplit between " + numCmdrs + " CMDRs\n" +
+          "Goal per CMDR: " + Math.round(perCmdrRemaining).toLocaleString('en-GB') + " CP\n";
+      }
+      window.discordCopyText += "\n**Requirements (Choose ONE)**\n" +
+        "- Classified Data: " + document.getElementById('resClassified').textContent + "\n" +
+        "- Association / Political Data: " + document.getElementById('resAssociation').textContent + "\n" +
+        "- Research / Industrial Data: " + document.getElementById('resResearch').textContent + "\n" +
+        "- Power Commodities: " + document.getElementById('resCommodity').textContent + "\n";
     }
 
     // Score input (manual — clears the state helper)
@@ -889,6 +919,24 @@
     
     // Split input
     document.getElementById('numCmdrs').addEventListener('input', calculate);
+
+    // Discord Copy Button
+    document.getElementById('btnCopyDiscord').addEventListener('click', function() {
+      if (window.discordCopyText) {
+        navigator.clipboard.writeText(window.discordCopyText).then(function() {
+          var btn = document.getElementById('btnCopyDiscord');
+          var orig = btn.innerHTML;
+          btn.innerHTML = '&#10003; Copied to clipboard!';
+          btn.style.color = '#fff';
+          btn.style.background = '#5865F2';
+          setTimeout(function() {
+            btn.innerHTML = orig;
+            btn.style.color = '#5865F2';
+            btn.style.background = 'rgba(88, 101, 242, 0.1)';
+          }, 2000);
+        });
+      }
+    });
 
     // Reset button
     document.getElementById('resetMerits').addEventListener('click', function() {
