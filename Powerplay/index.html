@@ -149,7 +149,9 @@
     .settings-toggle {
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 6px;
+      flex: 1;
       background: none;
       border: 1px solid var(--border-color);
       border-radius: 4px;
@@ -285,8 +287,8 @@
       flex-shrink: 0;
     }
 
-    /* ── Mode buttons (Reinforce / Undermine) ── */
-    .mode-row {
+    /* ── Controls Row (Merit values toggle + Modes) ── */
+    .controls-row {
       display: flex;
       gap: 10px;
       margin-top: 14px;
@@ -493,11 +495,19 @@
       <div class="state-readout" id="stateReadout"></div>
     </div>
 
-    <!-- Merit settings -->
-    <button class="settings-toggle" id="settingsToggle" aria-expanded="false" aria-controls="settingsPanel">
-      &#9881; Merit Values
-      <em class="chevron">&#9650;</em>
-    </button>
+    <!-- Controls: Merit settings toggle + Modes -->
+    <div class="controls-row">
+      <button class="settings-toggle" id="settingsToggle" aria-expanded="false" aria-controls="settingsPanel">
+        &#9881; Merit Values
+        <em class="chevron">&#9650;</em>
+      </button>
+      <button class="mode-btn" id="btnReinforce" aria-pressed="false">
+        &#8600; Reinforce <span class="mode-badge" id="reinforceBadge"></span>
+      </button>
+      <button class="mode-btn" id="btnUndermine" aria-pressed="false">
+        &#8599; Undermine <span class="mode-badge" id="undermineBadge"></span>
+      </button>
+    </div>
 
     <div class="settings-panel" id="settingsPanel">
       <div class="settings-inner">
@@ -525,18 +535,36 @@
       </div>
     </div>
 
-    <!-- Reinforce / Undermine mode -->
-    <div class="mode-row">
-      <button class="mode-btn" id="btnReinforce" aria-pressed="false">
-        &#8600; Reinforce <span class="mode-badge" id="reinforceBadge"></span>
-      </button>
-      <button class="mode-btn" id="btnUndermine" aria-pressed="false">
-        &#8599; Undermine <span class="mode-badge" id="undermineBadge"></span>
-      </button>
+    <!-- Current Inventory -->
+    <div class="inventory-section">
+      <div class="or-divider">Current Inventory (Optional)</div>
+      <div class="settings-inner" style="background-color: var(--card-bg);">
+        <div class="settings-grid">
+          <div class="merit-field">
+            <label for="invClassified">Classified Data</label>
+            <input type="number" id="invClassified" min="0" step="1" placeholder="0">
+          </div>
+          <div class="merit-field">
+            <label for="invAssociation">Association Data</label>
+            <input type="number" id="invAssociation" min="0" step="1" placeholder="0">
+          </div>
+          <div class="merit-field">
+            <label for="invResearch">Research Data</label>
+            <input type="number" id="invResearch" min="0" step="1" placeholder="0">
+          </div>
+          <div class="merit-field">
+            <label for="invCommodity">Power Commodities</label>
+            <input type="number" id="invCommodity" min="0" step="1" placeholder="0">
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Results -->
     <div class="results">
+      <div id="remainingReadout" style="font-size: 0.85rem; color: var(--text-color); margin-bottom: 12px; display: none;">
+        Inventory covers <strong id="invCoverage" style="color: var(--accent-color);">0</strong> CP. Remaining: <strong id="remScore" style="color: var(--accent-color);">0</strong> CP.
+      </div>
       <div class="result-item">
         <div>
           <div class="result-label">Classified Data</div>
@@ -588,7 +616,7 @@
         classified:  486,   // Power Classified Data
         association: 324,   // Power Association / Political Data
         research:    324,   // Power Research / Industrial Data
-        commodity:    85,   // Powerplay Goods / Commodities
+        commodity:    82,   // Powerplay Goods / Commodities
       },
 
       // Control-point score ceiling for each system tier
@@ -638,6 +666,15 @@
       return ((merits * mult) / 4).toFixed(2).replace(/\.?0+$/, '');
     }
 
+    function getInventory() {
+      return {
+        classified:  parseInt(document.getElementById('invClassified').value,  10) || 0,
+        association: parseInt(document.getElementById('invAssociation').value, 10) || 0,
+        research:    parseInt(document.getElementById('invResearch').value,    10) || 0,
+        commodity:   parseInt(document.getElementById('invCommodity').value,   10) || 0,
+      };
+    }
+
     var SCORE_CAP = CONFIG.tiers.stronghold * 4; // hard ceiling — 4x Stronghold max
 
     function parseScore(raw) {
@@ -666,6 +703,7 @@
       var score = parseScore(document.getElementById('controlScore').value);
       var m     = getMerits();
       var mult  = getMultiplier();
+      var inv   = getInventory();
 
       // Effective merits after mode multiplier
       var eff = {
@@ -689,13 +727,30 @@
         ['resClassified','resAssociation','resResearch','resCommodity'].forEach(function(id) {
           document.getElementById(id).textContent = '—';
         });
+        document.getElementById('remainingReadout').style.display = 'none';
         return;
       }
 
-      document.getElementById('resClassified').textContent  = itemsNeeded(score, eff.classified).toLocaleString()  + ' pieces';
-      document.getElementById('resAssociation').textContent = itemsNeeded(score, eff.association).toLocaleString() + ' pieces';
-      document.getElementById('resResearch').textContent    = itemsNeeded(score, eff.research).toLocaleString()    + ' pieces';
-      document.getElementById('resCommodity').textContent   = itemsNeeded(score, eff.commodity).toLocaleString()   + ' units';
+      // Calculate how much CP the inventory already provides
+      var invScore = (inv.classified * eff.classified / 4) +
+                     (inv.association * eff.association / 4) +
+                     (inv.research * eff.research / 4) +
+                     (inv.commodity * eff.commodity / 4);
+
+      var remainingScore = Math.max(0, score - invScore);
+
+      if (invScore > 0) {
+        document.getElementById('remainingReadout').style.display = 'block';
+        document.getElementById('invCoverage').textContent = Math.round(invScore).toLocaleString('en-GB');
+        document.getElementById('remScore').textContent = Math.round(remainingScore).toLocaleString('en-GB');
+      } else {
+        document.getElementById('remainingReadout').style.display = 'none';
+      }
+
+      document.getElementById('resClassified').textContent  = itemsNeeded(remainingScore, eff.classified).toLocaleString()  + ' pieces';
+      document.getElementById('resAssociation').textContent = itemsNeeded(remainingScore, eff.association).toLocaleString() + ' pieces';
+      document.getElementById('resResearch').textContent    = itemsNeeded(remainingScore, eff.research).toLocaleString()    + ' pieces';
+      document.getElementById('resCommodity').textContent   = itemsNeeded(remainingScore, eff.commodity).toLocaleString()   + ' units';
     }
 
     // Score input (manual — clears the state helper)
@@ -740,6 +795,11 @@
 
     // Merit inputs
     ['meritClassified','meritAssociation','meritResearch','meritCommodity'].forEach(function(id) {
+      document.getElementById(id).addEventListener('input', calculate);
+    });
+
+    // Inventory inputs
+    ['invClassified','invAssociation','invResearch','invCommodity'].forEach(function(id) {
       document.getElementById(id).addEventListener('input', calculate);
     });
 
