@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Control Score Calculator</title>
+  <meta name="description" content="Elite Dangerous Powerplay 2.0 Control Score Calculator – find out how much data and commodities to hand in to counter a system's control score.">
+  <style>
+    :root {
+      --bg-color: #121212;
+      --card-bg: #1e1e1e;
+      --accent-color: #ff8c00;
+      --text-color: #e0e0e0;
+      --border-color: #333;
+      --muted-color: #888;
+      --input-bg: #2b2b2b;
+      --settings-bg: #181818;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .container {
+      background-color: var(--card-bg);
+      border: 1px solid var(--accent-color);
+      border-radius: 8px;
+      padding: 24px;
+      max-width: 520px;
+      width: 100%;
+      box-shadow: 0 4px 12px rgba(255, 140, 0, 0.15);
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      color: var(--accent-color);
+      margin-top: 0;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      text-align: center; /* <-- This centers the text */
+      margin-bottom: 12px;
+    }
+    .header-links {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.85rem;
+    }
+
+    .header-links a {
+      color: var(--muted-color);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .header-links a:hover {
+      color: var(--accent-color);
+    }
+
+    /* ── Score input ── */
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-group label {
+      text-align: center;
+      font-size: 0.78rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted-color);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      background-color: var(--input-bg);
+      border: 1px solid var(--border-color);
+      color: #fff;
+      border-radius: 4px;
+      font-size: 1rem;
+      box-sizing: border-box;
+      -moz-appearance: textfield;
+    }
+
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+    }
+
+    input[type="number"]:focus {
+      outline: none;
+      border-color: var(--accent-color);
+    }
+
+    /* ── Hero score input ── */
+    #controlScore {
+      display: block;
+      width: 220px;
+      max-width: 100%;
+      margin: 0 auto;
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      padding: 14px 16px;
+      background: linear-gradient(180deg, #262626, #202020);
+      border: 1px solid #3a3a3a;
+      color: var(--accent-color);
+      text-align: center;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+
+    #controlScore::placeholder {
+      color: #5a5a5a;
+      font-weight: 400;
+      font-size: 1rem;
+      letter-spacing: normal;
+    }
+
+    #controlScore:hover {
+      border-color: #4a4a4a;
+    }
+
+    #controlScore:focus {
+      border-color: var(--accent-color);
+      background: linear-gradient(180deg, #2a2210, #221c0c);
+      box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.18);
+    }
+
+    /* ── Merit settings toggle ── */
+    .settings-toggle {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: none;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 6px 12px;
+      color: var(--muted-color);
+      font-family: inherit;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+      margin-bottom: 0;
+    }
+
+    .settings-toggle:hover {
+      border-color: var(--accent-color);
+      color: var(--accent-color);
+    }
+
+    .settings-toggle .chevron {
+      font-style: normal;
+      font-size: 0.6rem;
+      transition: transform 0.2s;
+    }
+
+    .settings-toggle[aria-expanded="true"] .chevron {
+      transform: rotate(180deg);
+    }
+
+    /* ── Settings panel ── */
+    .settings-panel {
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      transition: max-height 0.28s ease, opacity 0.22s ease, margin-top 0.22s ease;
+      margin-top: 0;
+    }
+
+    .settings-panel.open {
+      max-height: 280px;
+      opacity: 1;
+      margin-top: 12px;
+    }
+
+    .settings-inner {
+      background-color: var(--settings-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 14px;
+    }
+
+    .settings-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    @media (max-width: 420px) {
+      .settings-grid { grid-template-columns: 1fr; }
+    }
+
+    .merit-field label {
+      font-size: 0.75rem;
+      font-weight: normal;
+      color: var(--muted-color);
+      margin-bottom: 4px;
+      letter-spacing: 0;
+    }
+
+    .merit-field input {
+      padding: 7px 10px;
+      font-size: 0.95rem;
+      color: var(--accent-color);
+    }
+
+    .settings-footer {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 10px;
+    }
+
+    .reset-btn {
+      background: none;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 5px 12px;
+      color: var(--muted-color);
+      font-family: inherit;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .reset-btn:hover {
+      border-color: var(--accent-color);
+      color: var(--accent-color);
+    }
+
+    /* ── Results ── */
+    .results {
+      margin-top: 20px;
+    }
+
+    .result-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .result-item:last-child {
+      border-bottom: none;
+    }
+
+    .result-label {
+      font-size: 0.9rem;
+    }
+
+    .result-merits {
+      font-size: 0.75rem;
+      color: var(--muted-color);
+      margin-top: 2px;
+    }
+
+    .result-value {
+      font-weight: bold;
+      color: var(--accent-color);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* ── Mode buttons (Reinforce / Undermine) ── */
+    .mode-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .mode-btn {
+      flex: 1;
+      padding: 8px 12px;
+      border-radius: 4px;
+      border: 1px solid var(--border-color);
+      background: none;
+      color: var(--muted-color);
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+    }
+
+    .mode-btn:hover {
+      color: var(--text-color);
+      border-color: #555;
+    }
+
+    /* Reinforce = red */
+    #btnReinforce.active {
+      border-color: #cc3030;
+      color: #ff5555;
+      background: rgba(204, 48, 48, 0.1);
+    }
+
+    /* Undermine = green */
+    #btnUndermine.active {
+      border-color: #2a9d2a;
+      color: #44dd44;
+      background: rgba(42, 157, 42, 0.1);
+    }
+
+    .mode-badge {
+      display: inline-block;
+      margin-left: 5px;
+      font-size: 0.72rem;
+      font-weight: normal;
+      opacity: 0.8;
+    }
+
+    /* ── OR divider ── */
+    .or-divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 16px 0;
+      color: var(--muted-color);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .or-divider::before,
+    .or-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border-color);
+    }
+
+    /* ── State helper ── */
+    .state-section label {
+      font-size: 0.82rem;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .state-row {
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+    }
+
+    .state-row .state-select-wrap { flex: 1.4; }
+    .state-row .state-pct-wrap    { flex: 1; }
+
+    .state-row label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: normal;
+      color: var(--muted-color);
+      margin-bottom: 4px;
+    }
+
+    select#stateSelect {
+      width: 100%;
+      padding: 10px;
+      background-color: var(--input-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-color);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-sizing: border-box;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+    }
+
+    select#stateSelect:focus {
+      outline: none;
+      border-color: var(--accent-color);
+    }
+
+    .pct-wrap-inner {
+      position: relative;
+    }
+
+    .pct-wrap-inner input {
+      padding-right: 28px;
+    }
+
+    .pct-symbol {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted-color);
+      font-size: 0.9rem;
+      pointer-events: none;
+    }
+
+    .state-readout {
+      margin-top: 8px;
+      font-size: 0.78rem;
+      color: var(--muted-color);
+      min-height: 1.1em;
+    }
+
+    .tier-badge {
+      display: inline-block;
+      padding: 1px 7px;
+      border-radius: 3px;
+      font-size: 0.7rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-right: 4px;
+    }
+
+    .badge-exploited  { background: rgba(100,160,255,0.15); color: #6aa0ff; border: 1px solid rgba(100,160,255,0.3); }
+    .badge-fortified  { background: rgba(255,180, 50,0.15); color: #ffb432; border: 1px solid rgba(255,180, 50,0.3); }
+    .badge-stronghold { background: rgba(255, 70, 70,0.15); color: #ff5555; border: 1px solid rgba(255, 70, 70,0.3); }
+
+    /* ── Footer note ── */
+    .footnote {
+      margin-top: 18px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-color);
+      font-size: 0.72rem;
+      color: var(--muted-color);
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Data Calculator</h1>
+    
+    <div class="header-links">
+      <a href="https://inara.cz/elite/search/system/" target="_blank">Inara System Search</a>
+      <a href="https://inara.cz/elite/power/11/" target="_blank">Yuri Grom Inara</a>
+    </div>
+
+    <!-- Control Score input -->
+    <div class="input-group">
+      <label for="controlScore">System Control Score:</label>
+      <input type="text" inputmode="numeric" id="controlScore" value="" placeholder="Enter target score">
+    </div>
+
+    <!-- OR: calculate from system state -->
+    <div class="or-divider">or calculate from system state</div>
+
+    <div class="state-section">
+      <div class="state-row">
+        <div class="state-select-wrap">
+          <label for="stateSelect">System State</label>
+          <select id="stateSelect">
+            <option value="">— Select state —</option>
+            <option value="exploited">Exploited</option>
+            <option value="fortified">Fortified</option>
+            <option value="stronghold">Stronghold</option>
+          </select>
+        </div>
+        <div class="state-pct-wrap">
+          <label for="statePct">Progress</label>
+          <div class="pct-wrap-inner">
+            <input type="number" id="statePct" min="0" max="100" step="1" placeholder="0">
+            <span class="pct-symbol">%</span>
+          </div>
+        </div>
+      </div>
+      <div class="state-readout" id="stateReadout"></div>
+    </div>
+
+    <!-- Merit settings -->
+    <button class="settings-toggle" id="settingsToggle" aria-expanded="false" aria-controls="settingsPanel">
+      &#9881; Merit Values
+      <em class="chevron">&#9650;</em>
+    </button>
+
+    <div class="settings-panel" id="settingsPanel">
+      <div class="settings-inner">
+        <div class="settings-grid">
+          <div class="merit-field">
+            <label for="meritClassified">Classified Data (merits)</label>
+            <input type="number" id="meritClassified" min="1" step="1">
+          </div>
+          <div class="merit-field">
+            <label for="meritAssociation">Association Data (merits)</label>
+            <input type="number" id="meritAssociation" min="1" step="1">
+          </div>
+          <div class="merit-field">
+            <label for="meritResearch">Research Data (merits)</label>
+            <input type="number" id="meritResearch" min="1" step="1">
+          </div>
+          <div class="merit-field">
+            <label for="meritCommodity">Power Commodities (merits)</label>
+            <input type="number" id="meritCommodity" min="1" step="1">
+          </div>
+        </div>
+        <div class="settings-footer">
+          <button class="reset-btn" id="resetMerits">&#8635; Reset to defaults</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reinforce / Undermine mode -->
+    <div class="mode-row">
+      <button class="mode-btn" id="btnReinforce" aria-pressed="false">
+        &#8600; Reinforce <span class="mode-badge" id="reinforceBadge"></span>
+      </button>
+      <button class="mode-btn" id="btnUndermine" aria-pressed="false">
+        &#8599; Undermine <span class="mode-badge" id="undermineBadge"></span>
+      </button>
+    </div>
+
+    <!-- Results -->
+    <div class="results">
+      <div class="result-item">
+        <div>
+          <div class="result-label">Classified Data</div>
+          <div class="result-merits" id="labelClassified"></div>
+        </div>
+        <span class="result-value" id="resClassified">—</span>
+      </div>
+      <div class="result-item">
+        <div>
+          <div class="result-label">Association / Political Data</div>
+          <div class="result-merits" id="labelAssociation"></div>
+        </div>
+        <span class="result-value" id="resAssociation">—</span>
+      </div>
+      <div class="result-item">
+        <div>
+          <div class="result-label">Research / Industrial Data</div>
+          <div class="result-merits" id="labelResearch"></div>
+        </div>
+        <span class="result-value" id="resResearch">—</span>
+      </div>
+      <div class="result-item">
+        <div>
+          <div class="result-label">Power Commodities</div>
+          <div class="result-merits" id="labelCommodity"></div>
+        </div>
+        <span class="result-value" id="resCommodity">—</span>
+      </div>
+    </div>
+
+    <p class="footnote" id="footnote">
+      <span class="example">If you want to find out the system's % go to inara.cz then search the system and you'll see the % and the State. E.G Exploited 25.6%</span>
+      <br><br>
+      Note: Post-4&times; multiplier values. Control Points per delivery = Merits &divide; 4.
+    </p>
+  </div>
+
+  <script>
+    /* ============================================================
+        CONFIG — edit these values when Frontier patches the game.
+        Everything on the page (input defaults, tooltip labels,
+        mode badges, results) is derived from this object, so
+        changing a number here is the only edit you need to make.
+        ============================================================ */
+    var CONFIG = {
+
+      // Merit value per delivery (post-4x multiplier era)
+      merits: {
+        classified:  486,   // Power Classified Data
+        association: 324,   // Power Association / Political Data
+        research:    324,   // Power Research / Industrial Data
+        commodity:    85,   // Powerplay Goods / Commodities
+      },
+
+      // Control-point score ceiling for each system tier
+      // (% shown in-game = current score ÷ tier max)
+      tiers: {
+        exploited:  350000,
+        fortified:  650000,
+        stronghold: 1000000,
+      },
+
+      // Reinforce / Undermine merit multipliers
+      reinforceMultiplier: 0.85,   // -15%
+      undermineMultiplier: 1.15,   // +15%
+
+    };
+    /* ============================================================ */
+
+    // Internal — derived from CONFIG, do not edit below this line
+    var TIERS = {
+      exploited:  { max: CONFIG.tiers.exploited,  label: 'Exploited',  badge: 'badge-exploited'  },
+      fortified:  { max: CONFIG.tiers.fortified,  label: 'Fortified',  badge: 'badge-fortified'  },
+      stronghold: { max: CONFIG.tiers.stronghold, label: 'Stronghold', badge: 'badge-stronghold' },
+    };
+    var DEFAULTS    = CONFIG.merits;
+    var activeMode  = null; // null | 'reinforce' | 'undermine'
+
+    var itemsNeeded = function(score, merits) {
+      return Math.ceil(score / (merits / 4));
+    };
+
+    function getMultiplier() {
+      if (activeMode === 'reinforce') return CONFIG.reinforceMultiplier;
+      if (activeMode === 'undermine') return CONFIG.undermineMultiplier;
+      return 1;
+    }
+
+    function getMerits() {
+      return {
+        classified:  Math.max(1, parseInt(document.getElementById('meritClassified').value,  10) || DEFAULTS.classified),
+        association: Math.max(1, parseInt(document.getElementById('meritAssociation').value, 10) || DEFAULTS.association),
+        research:    Math.max(1, parseInt(document.getElementById('meritResearch').value,    10) || DEFAULTS.research),
+        commodity:   Math.max(1, parseInt(document.getElementById('meritCommodity').value,   10) || DEFAULTS.commodity),
+      };
+    }
+
+    function fmtCP(merits, mult) {
+      return ((merits * mult) / 4).toFixed(2).replace(/\.?0+$/, '');
+    }
+
+    var SCORE_CAP = CONFIG.tiers.stronghold * 4; // hard ceiling — 4x Stronghold max
+
+    function parseScore(raw) {
+      return parseFloat(String(raw).replace(/,/g, '')) || 0;
+    }
+
+    function formatScoreField(el) {
+      // Re-render the field's digits with thousands separators,
+      // keeping the cursor the same distance from the right edge
+      // so typing in the middle doesn't jump the caret around.
+      var raw = el.value.replace(/[^\d]/g, '');
+      if (!raw) { el.value = ''; return; }
+
+      var distFromEnd = el.value.length - el.selectionEnd;
+      var num = Math.min(parseInt(raw, 10), SCORE_CAP);
+      var formatted = num.toLocaleString('en-GB');
+      var wasClamped = parseInt(raw, 10) > SCORE_CAP;
+      el.value = formatted;
+
+      var pos = wasClamped ? formatted.length : formatted.length - distFromEnd;
+      pos = Math.max(0, Math.min(formatted.length, pos));
+      el.setSelectionRange(pos, pos);
+    }
+
+    function calculate() {
+      var score = parseScore(document.getElementById('controlScore').value);
+      var m     = getMerits();
+      var mult  = getMultiplier();
+
+      // Effective merits after mode multiplier
+      var eff = {
+        classified:  m.classified  * mult,
+        association: m.association * mult,
+        research:    m.research    * mult,
+        commodity:   m.commodity   * mult,
+      };
+
+      // Sub-labels: show base merits and effective CP
+      var modeTag = activeMode === 'reinforce' ? ' <span style="color:#ff5555">(&#x00D7;' + CONFIG.reinforceMultiplier + ')</span>'
+                  : activeMode === 'undermine' ? ' <span style="color:#44dd44">(&#x00D7;' + CONFIG.undermineMultiplier + ')</span>'
+                  : '';
+
+      document.getElementById('labelClassified').innerHTML  = m.classified  + ' merits' + modeTag + ' &middot; ' + fmtCP(m.classified,  mult) + ' CP each';
+      document.getElementById('labelAssociation').innerHTML = m.association + ' merits' + modeTag + ' &middot; ' + fmtCP(m.association, mult) + ' CP each';
+      document.getElementById('labelResearch').innerHTML    = m.research    + ' merits' + modeTag + ' &middot; ' + fmtCP(m.research,    mult) + ' CP each';
+      document.getElementById('labelCommodity').innerHTML   = m.commodity   + ' merits' + modeTag + ' &middot; ' + fmtCP(m.commodity,   mult) + ' CP each';
+
+      if (score <= 0) {
+        ['resClassified','resAssociation','resResearch','resCommodity'].forEach(function(id) {
+          document.getElementById(id).textContent = '—';
+        });
+        return;
+      }
+
+      document.getElementById('resClassified').textContent  = itemsNeeded(score, eff.classified).toLocaleString()  + ' pieces';
+      document.getElementById('resAssociation').textContent = itemsNeeded(score, eff.association).toLocaleString() + ' pieces';
+      document.getElementById('resResearch').textContent    = itemsNeeded(score, eff.research).toLocaleString()    + ' pieces';
+      document.getElementById('resCommodity').textContent   = itemsNeeded(score, eff.commodity).toLocaleString()   + ' units';
+    }
+
+    // Score input (manual — clears the state helper)
+    document.getElementById('controlScore').addEventListener('input', function(e) {
+      formatScoreField(e.target);
+      document.getElementById('stateSelect').value = '';
+      document.getElementById('statePct').value    = '';
+      document.getElementById('stateReadout').innerHTML = '';
+      calculate();
+    });
+
+    // State helper
+    var stateSelect  = document.getElementById('stateSelect');
+    var statePct     = document.getElementById('statePct');
+    var stateReadout = document.getElementById('stateReadout');
+
+    function applyState() {
+      var tier = stateSelect.value;
+      var pct  = parseFloat(statePct.value);
+
+      if (!tier || isNaN(pct)) {
+        stateReadout.innerHTML = '';
+        return;
+      }
+
+      pct = Math.min(100, Math.max(0, pct));
+      var t     = TIERS[tier];
+      var score = Math.round((pct / 100) * t.max);
+
+      // Fill the score field and recalculate
+      document.getElementById('controlScore').value = Math.min(score, SCORE_CAP).toLocaleString('en-GB');
+      calculate();
+
+      stateReadout.innerHTML =
+        '<span class="tier-badge ' + t.badge + '">' + t.label + '</span>' +
+        'at ' + pct.toFixed(1) + '% &rarr; score&nbsp;<strong>' + score.toLocaleString('en-GB') + '</strong>' +
+        ' (max ' + t.max.toLocaleString('en-GB') + ')';
+    }
+
+    stateSelect.addEventListener('change', applyState);
+    statePct.addEventListener('input',    applyState);
+
+    // Merit inputs
+    ['meritClassified','meritAssociation','meritResearch','meritCommodity'].forEach(function(id) {
+      document.getElementById(id).addEventListener('input', calculate);
+    });
+
+    // Reset button
+    document.getElementById('resetMerits').addEventListener('click', function() {
+      document.getElementById('meritClassified').value  = DEFAULTS.classified;
+      document.getElementById('meritAssociation').value = DEFAULTS.association;
+      document.getElementById('meritResearch').value    = DEFAULTS.research;
+      document.getElementById('meritCommodity').value   = DEFAULTS.commodity;
+      calculate();
+    });
+
+    // Settings toggle
+    var toggle = document.getElementById('settingsToggle');
+    var panel  = document.getElementById('settingsPanel');
+
+    toggle.addEventListener('click', function() {
+      var open = panel.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+
+    // Reinforce / Undermine buttons
+    var btnReinforce = document.getElementById('btnReinforce');
+    var btnUndermine = document.getElementById('btnUndermine');
+
+    function setMode(mode) {
+      // Toggle off if already active
+      activeMode = (activeMode === mode) ? null : mode;
+      btnReinforce.classList.toggle('active', activeMode === 'reinforce');
+      btnUndermine.classList.toggle('active', activeMode === 'undermine');
+      btnReinforce.setAttribute('aria-pressed', activeMode === 'reinforce' ? 'true' : 'false');
+      btnUndermine.setAttribute('aria-pressed', activeMode === 'undermine' ? 'true' : 'false');
+      calculate();
+    }
+
+    btnReinforce.addEventListener('click', function() { setMode('reinforce'); });
+    btnUndermine.addEventListener('click', function() { setMode('undermine'); });
+
+    /* ── Init: pull every default straight from CONFIG so there is
+       a single source of truth. Previously the merit <input> tags
+       had their own hardcoded "value" attributes that didn't match
+       CONFIG.merits, so editing CONFIG had no visible effect until
+       someone clicked "Reset to defaults". Fixed by setting them
+       here instead of in the HTML. ── */
+    function init() {
+      document.getElementById('meritClassified').value  = DEFAULTS.classified;
+      document.getElementById('meritAssociation').value = DEFAULTS.association;
+      document.getElementById('meritResearch').value    = DEFAULTS.research;
+      document.getElementById('meritCommodity').value   = DEFAULTS.commodity;
+
+      document.getElementById('reinforceBadge').textContent =
+        '\u2212' + Math.round((1 - CONFIG.reinforceMultiplier) * 100) + '%';
+      document.getElementById('undermineBadge').textContent =
+        '+' + Math.round((CONFIG.undermineMultiplier - 1) * 100) + '%';
+
+      calculate();
+    }
+
+    init();
+  </script>
+
+</body>
+</html>
