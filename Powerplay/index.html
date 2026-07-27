@@ -9,7 +9,7 @@
     :root {
       --bg-color: #121212;
       --card-bg: #1e1e1e;
-      --accent-color: #ff8c00;
+      --accent-color: rgb(62, 127, 193);
       --text-color: #e0e0e0;
       --border-color: #333;
       --muted-color: #888;
@@ -89,7 +89,7 @@
       font-weight: bold;
     }
 
-    input[type="number"] {
+    input[type="number"], input[type="text"]:not(#controlScore) {
       width: 100%;
       padding: 10px;
       background-color: var(--input-bg);
@@ -114,18 +114,17 @@
     /* ── Hero score input ── */
     #controlScore {
       display: block;
-      width: 220px;
-      max-width: 100%;
-      margin: 0 auto;
-      font-size: 1.4rem;
+      width: 100%;
+      font-size: 1.1rem;
       font-weight: 700;
       letter-spacing: 0.02em;
-      padding: 14px 16px;
+      padding: 9px 12px;
       background: linear-gradient(180deg, #262626, #202020);
       border: 1px solid #3a3a3a;
       color: var(--accent-color);
       text-align: center;
       transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+      box-sizing: border-box;
     }
 
     #controlScore::placeholder {
@@ -259,17 +258,41 @@
       margin-top: 20px;
     }
 
-    .result-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      gap: 12px;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--border-color);
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
     }
 
-    .result-item:last-child {
-      border-bottom: none;
+    .result-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      background-color: var(--input-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 10px 4px;
+    }
+
+    .result-label {
+      font-size: 0.7rem;
+      line-height: 1.2;
+      margin-bottom: 4px;
+      min-height: 2.4em;
+    }
+
+    .result-merits {
+      font-size: 0.65rem;
+      color: var(--muted-color);
+      margin-bottom: 8px;
+    }
+
+    .result-value {
+      font-weight: bold;
+      color: var(--accent-color);
+      font-size: 0.9rem;
+      margin-top: auto;
     }
 
     /* ── Split Section ── */
@@ -350,18 +373,18 @@
       border-color: #555;
     }
 
-    /* Reinforce = red */
+    /* Reinforce = green */
     #btnReinforce.active {
-      border-color: #cc3030;
-      color: #ff5555;
-      background: rgba(204, 48, 48, 0.1);
-    }
-
-    /* Undermine = green */
-    #btnUndermine.active {
       border-color: #2a9d2a;
       color: #44dd44;
       background: rgba(42, 157, 42, 0.1);
+    }
+
+    /* Undermine = red */
+    #btnUndermine.active {
+      border-color: #cc3030;
+      color: #ff5555;
+      background: rgba(204, 48, 48, 0.1);
     }
 
     .mode-badge {
@@ -492,17 +515,40 @@
 <body>
 
   <div class="container">
-    <h1>Data Calculator</h1>
-    
-    <div class="header-links">
-      <a href="https://inara.cz/elite/search/system/" target="_blank">Inara System Search</a>
-      <a href="https://inara.cz/elite/power/11/" target="_blank">Yuri Grom Inara</a>
+    <div style="position: relative;">
+      <h1>Data Calculator</h1>
+      <button class="reset-btn" id="btnClearForm" style="position: absolute; right: 0; top: 0; padding: 4px 8px; font-size: 0.65rem;" title="Clear Form Data">&#10005; Clear Form</button>
     </div>
 
-    <!-- Control Score input -->
-    <div class="input-group">
-      <label for="controlScore">System Control Score:</label>
-      <input type="text" inputmode="numeric" id="controlScore" value="" placeholder="Enter target score">
+    <div style="margin-bottom: 20px; text-align: center;">
+      <button class="settings-toggle" id="infoToggle" aria-expanded="false" style="border: none; margin: 0 auto;">
+        &#9432; Information &amp; Tips
+        <em class="chevron">&#9650;</em>
+      </button>
+      <div class="settings-panel" id="infoPanel" style="text-align: left;">
+        <div class="settings-inner" style="font-size: 0.75rem; line-height: 1.5; margin-top: 8px;">
+          <span class="example">If you want to find out the system's % go to inara.cz then search the system and you'll see the % and the State. E.G Exploited 25.6%</span>
+          <br><br>
+          Note: Post-4&times; multiplier values. Control Points per delivery = Merits &divide; 4.
+          <br><br>
+          This page does remember what you have typed in to it so if you dont want it to remember the system name click clear form button. 
+        </div>
+      </div>
+    </div>
+
+    <!-- System Name and Control Score -->
+    <div style="display: flex; gap: 16px; margin-bottom: 20px;">
+      <div class="input-group" style="flex: 1; margin-bottom: 0;">
+        <label for="systemName">System Name:</label>
+        <div style="display: flex; gap: 10px;">
+          <input type="text" id="systemName" placeholder="e.g. Jonai" style="flex: 1;">
+          <a id="systemInaraLink" href="#" target="_blank" style="display: none; align-items: center; justify-content: center; padding: 0 16px; background-color: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: var(--accent-color); text-decoration: none; font-size: 0.9rem; font-weight: bold; transition: border-color 0.2s;">Inara</a>
+        </div>
+      </div>
+      <div class="input-group" style="flex: 1; margin-bottom: 0;">
+        <label for="controlScore">System Control Score:</label>
+        <input type="text" inputmode="numeric" id="controlScore" value="" placeholder="Enter system control score">
+      </div>
     </div>
 
     <!-- OR: calculate from system state -->
@@ -537,10 +583,10 @@
         <em class="chevron">&#9650;</em>
       </button>
       <button class="mode-btn" id="btnReinforce" aria-pressed="false">
-        &#8600; Reinforce <span class="mode-badge" id="reinforceBadge"></span>
+        &#8593; Reinforce <span class="mode-badge" id="reinforceBadge"></span>
       </button>
       <button class="mode-btn" id="btnUndermine" aria-pressed="false">
-        &#8599; Undermine <span class="mode-badge" id="undermineBadge"></span>
+        &#8595; Undermine <span class="mode-badge" id="undermineBadge"></span>
       </button>
     </div>
 
@@ -560,7 +606,7 @@
             <input type="number" id="meritResearch" min="1" step="1">
           </div>
           <div class="merit-field">
-            <label for="meritCommodity">Power Goods (merits)</label>
+            <label for="meritCommodity">Power Commodities (merits)</label>
             <input type="number" id="meritCommodity" min="1" step="1">
           </div>
         </div>
@@ -617,44 +663,32 @@
     <div class="results">
       <div id="remainingReadout" style="font-size: 0.85rem; color: var(--text-color); margin-bottom: 12px; display: none; line-height: 1.5;">
       </div>
-      <div class="result-item">
-        <div>
+      <div class="results-grid">
+        <div class="result-item">
           <div class="result-label">Classified Data</div>
           <div class="result-merits" id="labelClassified"></div>
+          <span class="result-value" id="resClassified">—</span>
         </div>
-        <span class="result-value" id="resClassified">—</span>
-      </div>
-      <div class="result-item">
-        <div>
+        <div class="result-item">
           <div class="result-label">Association / Political Data</div>
           <div class="result-merits" id="labelAssociation"></div>
+          <span class="result-value" id="resAssociation">—</span>
         </div>
-        <span class="result-value" id="resAssociation">—</span>
-      </div>
-      <div class="result-item">
-        <div>
+        <div class="result-item">
           <div class="result-label">Research / Industrial Data</div>
           <div class="result-merits" id="labelResearch"></div>
+          <span class="result-value" id="resResearch">—</span>
         </div>
-        <span class="result-value" id="resResearch">—</span>
-      </div>
-      <div class="result-item">
-        <div>
-          <div class="result-label">Power Goods</div>
+        <div class="result-item">
+          <div class="result-label">Power Commodities</div>
           <div class="result-merits" id="labelCommodity"></div>
+          <span class="result-value" id="resCommodity">—</span>
         </div>
-        <span class="result-value" id="resCommodity">—</span>
       </div>
       <div style="margin-top: 20px; text-align: center;">
         <button class="mode-btn" id="btnCopyDiscord" style="width: 100%; max-width: 280px; display: none; border-color: #5865F2; color: #5865F2; background: rgba(88, 101, 242, 0.1);">&#128203; Copy for Discord</button>
       </div>
     </div>
-
-    <p class="footnote" id="footnote">
-      <span class="example">If you want to find out the system's % go to inara.cz then search the system and you'll see the % and the State. E.G Exploited 25.6%</span>
-      <br><br>
-      Note: Post-4&times; multiplier values. Control Points per delivery = Merits &divide; 4.
-    </p>
   </div>
 
   <script>
@@ -737,6 +771,24 @@
 
     var SCORE_CAP = CONFIG.tiers.stronghold * 4; // hard ceiling — 4x Stronghold max
 
+    function saveOptions() {
+      var sn = document.getElementById('systemName');
+      if (!sn) return;
+      var opts = {
+        systemName: sn.value,
+        controlScore: document.getElementById('controlScore').value,
+        stateSelect: document.getElementById('stateSelect').value,
+        statePct: document.getElementById('statePct').value,
+        numCmdrs: document.getElementById('numCmdrs').value,
+        activeMode: activeMode,
+        meritClassified: document.getElementById('meritClassified').value,
+        meritAssociation: document.getElementById('meritAssociation').value,
+        meritResearch: document.getElementById('meritResearch').value,
+        meritCommodity: document.getElementById('meritCommodity').value,
+      };
+      localStorage.setItem('ppOptions', JSON.stringify(opts));
+    }
+
     function parseScore(raw) {
       return parseFloat(String(raw).replace(/,/g, '')) || 0;
     }
@@ -760,6 +812,7 @@
     }
 
     function calculate() {
+      saveOptions();
       var score = parseScore(document.getElementById('controlScore').value);
       var m     = getMerits();
       var mult  = getMultiplier();
@@ -827,22 +880,49 @@
       
       document.getElementById('btnCopyDiscord').style.display = 'inline-block';
       
-      window.discordCopyText = "**Powerplay Target**\n" +
-        "Total System Target: " + Math.round(score).toLocaleString('en-GB') + " CP\n";
+      var systemName = document.getElementById('systemName') ? document.getElementById('systemName').value.trim() : '';
+      var systemLink = systemName ? '<https://inara.cz/elite/starsystem/?search=' + encodeURIComponent(systemName) + '>' : '';
+      var modeText = activeMode === 'reinforce' ? '(Reinforce)' : (activeMode === 'undermine' ? '(Undermine)' : '');
+      
+      var titleLine = "🎯 **Powerplay Target" + (systemName ? ": " + systemName : "") + "**";
+      if (modeText) titleLine += " *" + modeText + "*";
+
+      window.discordCopyText = titleLine + "\n";
+      if (systemLink) window.discordCopyText += "🔗 " + systemLink + "\n";
+      window.discordCopyText += "\n📊 **Score Breakdown**\n" +
+        "Total Target: " + Math.round(score).toLocaleString('en-GB') + " CP\n";
+      
       if (invScore > 0) {
         window.discordCopyText += "Inventory Coverage: " + Math.round(invScore).toLocaleString('en-GB') + " CP\n";
       }
       window.discordCopyText += "Remaining Goal: " + Math.round(remainingScore).toLocaleString('en-GB') + " CP\n";
+      
       if (numCmdrs > 1) {
-        window.discordCopyText += "\nSplit between " + numCmdrs + " CMDRs\n" +
+        window.discordCopyText += "\n👥 **Split between " + numCmdrs + " CMDRs**\n" +
           "Goal per CMDR: " + Math.round(perCmdrRemaining).toLocaleString('en-GB') + " CP\n";
       }
-      window.discordCopyText += "\n**Requirements (Choose ONE)**\n" +
-        "- Classified Data: " + document.getElementById('resClassified').textContent + "\n" +
-        "- Association / Political Data: " + document.getElementById('resAssociation').textContent + "\n" +
-        "- Research / Industrial Data: " + document.getElementById('resResearch').textContent + "\n" +
-        "- Power goods (from ody boxes): " + document.getElementById('resCommodity').textContent + "\n";
+      
+      var reqHeader = numCmdrs > 1 ? "Requirements per CMDR" : "Requirements";
+      window.discordCopyText += "\n📦 **" + reqHeader + " (Mix & Match)**\n" +
+        "• 📁 Classified Data: " + document.getElementById('resClassified').textContent + "\n" +
+        "• 🤝 Association / Political Data: " + document.getElementById('resAssociation').textContent + "\n" +
+        "• 🔬 Research / Industrial Data: " + document.getElementById('resResearch').textContent + "\n" +
+        "• 🔋 Power Commodities: " + document.getElementById('resCommodity').textContent + "\n";
     }
+
+    // System Name
+    var systemNameInput = document.getElementById('systemName');
+    var systemInaraLink = document.getElementById('systemInaraLink');
+    systemNameInput.addEventListener('input', function() {
+      var val = systemNameInput.value.trim();
+      if (val) {
+        systemInaraLink.href = 'https://inara.cz/elite/starsystem/?search=' + encodeURIComponent(val);
+        systemInaraLink.style.display = 'flex';
+      } else {
+        systemInaraLink.style.display = 'none';
+      }
+      saveOptions();
+    });
 
     // Score input (manual — clears the state helper)
     document.getElementById('controlScore').addEventListener('input', function(e) {
@@ -916,6 +996,45 @@
       saveInventory();
       calculate();
     });
+
+    // Clear Form
+    var btnClearForm = document.getElementById('btnClearForm');
+    if (btnClearForm) {
+      btnClearForm.addEventListener('click', function() {
+        document.getElementById('systemName').value = '';
+        var snLink = document.getElementById('systemInaraLink');
+        if (snLink) snLink.style.display = 'none';
+        
+        document.getElementById('controlScore').value = '';
+        
+        document.getElementById('stateSelect').value = '';
+        document.getElementById('statePct').value = '';
+        document.getElementById('stateReadout').innerHTML = '';
+        
+        document.getElementById('numCmdrs').value = '1';
+        
+        activeMode = null;
+        var bReinforce = document.getElementById('btnReinforce');
+        var bUndermine = document.getElementById('btnUndermine');
+        if (bReinforce) {
+          bReinforce.classList.remove('active');
+          bReinforce.setAttribute('aria-pressed', 'false');
+        }
+        if (bUndermine) {
+          bUndermine.classList.remove('active');
+          bUndermine.setAttribute('aria-pressed', 'false');
+        }
+
+        // Also clear inventory
+        ['invClassified','invAssociation','invPolitical','invResearch','invIndustrial','invCommodity'].forEach(function(id) {
+          var el = document.getElementById(id);
+          if (el) el.value = '';
+        });
+        saveInventory();
+        
+        calculate();
+      });
+    }
     
     // Split input
     document.getElementById('numCmdrs').addEventListener('input', calculate);
@@ -956,6 +1075,17 @@
       toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
 
+    // Info toggle
+    var infoToggle = document.getElementById('infoToggle');
+    var infoPanel  = document.getElementById('infoPanel');
+
+    if (infoToggle && infoPanel) {
+      infoToggle.addEventListener('click', function() {
+        var open = infoPanel.classList.toggle('open');
+        infoToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+    }
+
     // Reinforce / Undermine buttons
     var btnReinforce = document.getElementById('btnReinforce');
     var btnUndermine = document.getElementById('btnUndermine');
@@ -989,6 +1119,43 @@
         '\u2212' + Math.round((1 - CONFIG.reinforceMultiplier) * 100) + '%';
       document.getElementById('undermineBadge').textContent =
         '+' + Math.round((CONFIG.undermineMultiplier - 1) * 100) + '%';
+
+      // Load saved options if they exist
+      try {
+        var savedOpts = JSON.parse(localStorage.getItem('ppOptions'));
+        if (savedOpts) {
+          if (savedOpts.systemName !== undefined) {
+            var snInput = document.getElementById('systemName');
+            snInput.value = savedOpts.systemName;
+            var snLink = document.getElementById('systemInaraLink');
+            if (savedOpts.systemName.trim()) {
+              snLink.href = 'https://inara.cz/elite/starsystem/?search=' + encodeURIComponent(savedOpts.systemName.trim());
+              snLink.style.display = 'flex';
+            }
+          }
+          if (savedOpts.controlScore !== undefined) document.getElementById('controlScore').value = savedOpts.controlScore;
+          if (savedOpts.stateSelect !== undefined) document.getElementById('stateSelect').value = savedOpts.stateSelect;
+          if (savedOpts.statePct !== undefined) document.getElementById('statePct').value = savedOpts.statePct;
+          if (savedOpts.numCmdrs !== undefined) document.getElementById('numCmdrs').value = savedOpts.numCmdrs;
+          if (savedOpts.activeMode !== undefined && savedOpts.activeMode !== null) {
+            activeMode = savedOpts.activeMode;
+            var btnReinforce = document.getElementById('btnReinforce');
+            var btnUndermine = document.getElementById('btnUndermine');
+            btnReinforce.classList.toggle('active', activeMode === 'reinforce');
+            btnUndermine.classList.toggle('active', activeMode === 'undermine');
+            btnReinforce.setAttribute('aria-pressed', activeMode === 'reinforce' ? 'true' : 'false');
+            btnUndermine.setAttribute('aria-pressed', activeMode === 'undermine' ? 'true' : 'false');
+          }
+          if (savedOpts.meritClassified !== undefined) document.getElementById('meritClassified').value = savedOpts.meritClassified;
+          if (savedOpts.meritAssociation !== undefined) document.getElementById('meritAssociation').value = savedOpts.meritAssociation;
+          if (savedOpts.meritResearch !== undefined) document.getElementById('meritResearch').value = savedOpts.meritResearch;
+          if (savedOpts.meritCommodity !== undefined) document.getElementById('meritCommodity').value = savedOpts.meritCommodity;
+
+          if (savedOpts.stateSelect || savedOpts.statePct) {
+            applyState();
+          }
+        }
+      } catch (e) {}
 
       // Load saved inventory if it exists
       try {
