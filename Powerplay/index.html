@@ -253,6 +253,116 @@
       color: var(--accent-color);
     }
 
+    .reset-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    .reset-btn:disabled:hover {
+      border-color: var(--border-color);
+      color: var(--muted-color);
+    }
+
+    .reset-btn.copied-flash {
+      border-color: var(--accent-color);
+      color: var(--accent-color);
+      background: rgba(62, 127, 193, 0.12);
+    }
+
+    /* ── Info & Tips modal ── */
+    .top-actions-row .reset-btn {
+      padding: 5px 9px;
+      font-size: 0.7rem;
+      letter-spacing: 0.02em;
+      text-transform: none;
+    }
+
+    @media (max-width: 480px) {
+      .top-actions-row .reset-btn {
+        padding: 4px 6px;
+        font-size: 0.64rem;
+      }
+
+      .top-actions-row {
+        gap: 4px !important;
+      }
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal-box {
+      background-color: var(--card-bg);
+      border: 1px solid var(--accent-color);
+      border-radius: 8px;
+      max-width: 480px;
+      width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      background-color: var(--card-bg);
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 1rem;
+      color: var(--accent-color);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--muted-color);
+      font-size: 1.4rem;
+      line-height: 1;
+      cursor: pointer;
+      padding: 0 4px;
+      transition: color 0.2s;
+    }
+
+    .modal-close:hover {
+      color: var(--accent-color);
+    }
+
+    .modal-body {
+      padding: 16px 18px 20px;
+      font-size: 0.8rem;
+      line-height: 1.55;
+      color: var(--text-color);
+    }
+
+    .modal-body code {
+      background: var(--input-bg);
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 0.85em;
+    }
+
     /* ── Results ── */
     .results {
       margin-top: 20px;
@@ -515,26 +625,15 @@
 <body>
 
   <div class="container">
-    <div style="position: relative;">
-      <h1>Data Calculator</h1>
-      <button class="reset-btn" id="btnClearForm" style="position: absolute; right: 0; top: 0; padding: 4px 8px; font-size: 0.65rem;" title="Clear Form Data">&#10005; Clear Form</button>
+    <div class="top-actions-row" style="display: flex; gap: 6px; justify-content: center; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 16px; padding-bottom: 2px;">
+      <button class="reset-btn" id="btnClearForm" style="flex-shrink: 0; white-space: nowrap;" title="Clear Form Data">&#10005; Clear</button>
+      <button class="reset-btn" id="infoToggle" style="flex-shrink: 0; white-space: nowrap;" title="Information &amp; Tips">&#9432; Info</button>
+      <button class="reset-btn" id="btnCopyShareLink" style="flex-shrink: 0; white-space: nowrap;" title="Copy a link that pre-fills this page with your current inputs">&#128279; Link</button>
+      <button class="reset-btn" id="btnCopyInventory" style="flex-shrink: 0; white-space: nowrap;" title="Copy just your current inventory to Discord" disabled>&#127890; Inv</button>
+      <button class="reset-btn" id="btnCopyDiscord" style="flex-shrink: 0; white-space: nowrap;" title="Copy the full task breakdown to Discord" disabled>&#128203; Task</button>
     </div>
 
-    <div style="margin-bottom: 20px; text-align: center;">
-      <button class="settings-toggle" id="infoToggle" aria-expanded="false" style="border: none; margin: 0 auto;">
-        &#9432; Information &amp; Tips
-        <em class="chevron">&#9650;</em>
-      </button>
-      <div class="settings-panel" id="infoPanel" style="text-align: left;">
-        <div class="settings-inner" style="font-size: 0.75rem; line-height: 1.5; margin-top: 8px;">
-          <span class="example">If you want to find out the system's % go to inara.cz then search the system and you'll see the % and the State. E.G Exploited 25.6%</span>
-          <br><br>
-          Note: Post-4&times; multiplier values. Control Points per delivery = Merits &divide; 4.
-          <br><br>
-          This page does remember what you have typed in to it so if you dont want it to remember the system name click clear form button. 
-        </div>
-      </div>
-    </div>
+    <h1>Data Calculator</h1>
 
     <!-- System Name and Control Score -->
     <div style="display: flex; gap: 16px; margin-bottom: 20px;">
@@ -646,10 +745,15 @@
             <input type="number" id="invCommodity" min="0" step="1" placeholder="0">
           </div>
         </div>
-        <div class="settings-footer" style="justify-content: space-between; align-items: center;">
+        <div class="settings-footer" style="justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
           <div style="font-size: 0.85rem; color: var(--muted-color);">Total Items: <strong id="invTotalCount" style="color: var(--text-color);">0</strong></div>
-          <button class="reset-btn" id="clearInventory">&#10005; Clear Inventory</button>
+          <div style="display: flex; gap: 8px;">
+            <input type="file" id="importFileInput" accept=".json,application/json" style="display: none;">
+            <button class="reset-btn" id="btnImportInfo" title="Import your Data counts from ShipLocker.json">&#8593; Import Info</button>
+            <button class="reset-btn" id="clearInventory">&#10005; Clear Inventory</button>
+          </div>
         </div>
+        <div id="importReadout" style="font-size: 0.72rem; color: var(--muted-color); margin-top: 8px; display: none; line-height: 1.5;"></div>
       </div>
     </div>
 
@@ -685,8 +789,35 @@
           <span class="result-value" id="resCommodity">—</span>
         </div>
       </div>
-      <div style="margin-top: 20px; text-align: center;">
-        <button class="mode-btn" id="btnCopyDiscord" style="width: 100%; max-width: 280px; display: none; border-color: #5865F2; color: #5865F2; background: rgba(88, 101, 242, 0.1);">&#128203; Copy for Discord</button>
+    </div>
+  </div>
+
+  <!-- Info & Tips modal -->
+  <div id="infoModalOverlay" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2>&#9432; Information &amp; Tips</h2>
+        <button class="modal-close" id="infoModalClose" title="Close" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <span class="example">If you want to find out the system's % go to inara.cz then search the system and you'll see the % and the State. E.G Exploited 25.6%</span>
+        <br><br>
+        Note: Post-4&times; multiplier values. Control Points per delivery = Merits &divide; 4.
+        <br><br>
+        This page does remember what you have typed in to it so if you dont want it to remember the system name click clear form button.
+        <br><br>
+        <strong>Import Info:</strong> use the &ldquo;Import Info&rdquo; button in the Current Inventory section to auto-fill your Data <em>and</em> on-foot Power Goods counts from your game's <code>ShipLocker.json</code> file, instead of typing them in by hand.
+        <br><br>
+        You'll find <code>ShipLocker.json</code> in your Elite Dangerous saved games folder, alongside your Journal log files:
+        <br>
+        <code>C:\Users\&lt;YourUsername&gt;\Saved Games\Frontier Developments\Elite Dangerous\</code>
+        <br><br>
+        The game rewrites this file live, so grab the latest copy while docked or after visiting your ship locker/backpack. Only your own items (not a crewmate's) are imported &mdash; anything picked up by another CMDR riding in your ship is skipped automatically so it doesn't skew your totals.
+        <br><br>
+        <strong>Share Link:</strong> use the &ldquo;Share Link&rdquo; button up top to copy a URL that pre-fills this page with your system, score, mode, and inventory &mdash; handy for sending to squadmates.
+        <br><br>
+        <strong>What gets recognized from the ShipLocker file:</strong>
+        <div id="goodsListContainer" style="margin-top: 6px;"></div>
       </div>
     </div>
   </div>
@@ -843,7 +974,8 @@
           document.getElementById(id).textContent = '—';
         });
         document.getElementById('remainingReadout').style.display = 'none';
-        document.getElementById('btnCopyDiscord').style.display = 'none';
+        document.getElementById('btnCopyDiscord').disabled = true;
+        document.getElementById('btnCopyInventory').disabled = true;
         return;
       }
 
@@ -857,7 +989,11 @@
 
       var overallText = 'Total System Target: <strong>' + Math.round(score).toLocaleString('en-GB') + '</strong> CP<br>';
       if (invScore > 0) {
-        overallText += 'Inventory covers: <strong style="color: var(--accent-color);">' + Math.round(invScore).toLocaleString('en-GB') + '</strong> CP<br>';
+        var progressPct = Math.min(100, (invScore / score) * 100);
+        overallText += 'Inventory covers: <strong style="color: var(--accent-color);">' + Math.round(invScore).toLocaleString('en-GB') + '</strong> CP ' +
+          '<span style="color: var(--muted-color);">(' + progressPct.toFixed(1) + '% of goal)</span><br>';
+        overallText += '<div style="height:6px;border-radius:3px;background:var(--input-bg);overflow:hidden;margin:4px 0 8px;">' +
+          '<div style="height:100%;width:' + progressPct.toFixed(1) + '%;background:var(--accent-color);"></div></div>';
       }
       overallText += 'Remaining Goal: <strong>' + Math.round(remainingScore).toLocaleString('en-GB') + '</strong> CP';
 
@@ -877,37 +1013,90 @@
       document.getElementById('resAssociation').textContent = itemsNeeded(perCmdrRemaining, eff.association).toLocaleString() + ' pieces' + perCmdrText;
       document.getElementById('resResearch').textContent    = itemsNeeded(perCmdrRemaining, eff.research).toLocaleString()    + ' pieces' + perCmdrText;
       document.getElementById('resCommodity').textContent   = itemsNeeded(perCmdrRemaining, eff.commodity).toLocaleString()   + ' units' + perCmdrText;
-      
-      document.getElementById('btnCopyDiscord').style.display = 'inline-block';
-      
-      var systemName = document.getElementById('systemName') ? document.getElementById('systemName').value.trim() : '';
-      var systemLink = systemName ? '<https://inara.cz/elite/starsystem/?search=' + encodeURIComponent(systemName) + '>' : '';
-      var modeText = activeMode === 'reinforce' ? '(Reinforce)' : (activeMode === 'undermine' ? '(Undermine)' : '');
-      
-      var titleLine = "🎯 **Powerplay Target" + (systemName ? ": " + systemName : "") + "**";
-      if (modeText) titleLine += " *" + modeText + "*";
 
-      window.discordCopyText = titleLine + "\n";
-      if (systemLink) window.discordCopyText += "🔗 " + systemLink + "\n";
-      window.discordCopyText += "\n📊 **Score Breakdown**\n" +
-        "Total Target: " + Math.round(score).toLocaleString('en-GB') + " CP\n";
-      
-      if (invScore > 0) {
-        window.discordCopyText += "Inventory Coverage: " + Math.round(invScore).toLocaleString('en-GB') + " CP\n";
+      document.getElementById('btnCopyDiscord').disabled = false;
+      document.getElementById('btnCopyInventory').disabled = false;
+
+      var systemName = document.getElementById('systemName') ? document.getElementById('systemName').value.trim() : '';
+      var systemUrl  = systemName ? 'https://inara.cz/elite/starsystem/?search=' + encodeURIComponent(systemName) : '';
+      var systemDisplay = systemName ? '[' + systemName + '](' + systemUrl + ')' : '';
+      var modeAbbrev = activeMode === 'reinforce' ? 'RF' : (activeMode === 'undermine' ? 'UM' : '');
+
+      var titleLine = "🎯 **Powerplay Target" + (systemDisplay ? ": " + systemDisplay : "") + (modeAbbrev ? " " + modeAbbrev : "") + "**";
+
+      function textProgressBar(pct, len) {
+        len = len || 12;
+        var filled = Math.round((Math.min(100, Math.max(0, pct)) / 100) * len);
+        return '█'.repeat(filled) + '░'.repeat(len - filled);
       }
-      window.discordCopyText += "Remaining Goal: " + Math.round(remainingScore).toLocaleString('en-GB') + " CP\n";
-      
+
+      // Current inventory breakdown (only non-zero rows shown) — shared by both copy modes
+      var invRows = [
+        { icon: '📁', label: 'Classified Data',  count: parseInt(document.getElementById('invClassified').value, 10)  || 0, merits: eff.classified },
+        { icon: '🤝', label: 'Association Data',  count: parseInt(document.getElementById('invAssociation').value, 10) || 0, merits: eff.association },
+        { icon: '🗳️', label: 'Political Data',    count: parseInt(document.getElementById('invPolitical').value, 10)   || 0, merits: eff.association },
+        { icon: '🔬', label: 'Research Data',      count: parseInt(document.getElementById('invResearch').value, 10)    || 0, merits: eff.research },
+        { icon: '🏭', label: 'Industrial Data',    count: parseInt(document.getElementById('invIndustrial').value, 10)  || 0, merits: eff.research },
+        { icon: '🔋', label: 'Power Commodities',  count: parseInt(document.getElementById('invCommodity').value, 10)   || 0, merits: eff.commodity },
+      ].filter(function(r) { return r.count > 0; });
+
+      // ── Full task text ──
+      var taskText = titleLine + "\n";
+
+      taskText += "\n📊 **Score Breakdown**\n" +
+        "Total Target: " + Math.round(score).toLocaleString('en-GB') + " CP\n";
+
+      if (invScore > 0) {
+        var discordPct = Math.min(100, (invScore / score) * 100);
+        taskText += "Inventory Coverage: " + Math.round(invScore).toLocaleString('en-GB') + " CP\n" +
+          textProgressBar(discordPct) + " " + discordPct.toFixed(1) + "%\n";
+      }
+      taskText += "Remaining Goal: " + Math.round(remainingScore).toLocaleString('en-GB') + " CP\n";
+
+      if (invRows.length > 0) {
+        taskText += "\n🎒 **Your Current Inventory**\n";
+        invRows.forEach(function(r) {
+          var cp = Math.round(r.count * r.merits / 4);
+          taskText += "• " + r.icon + " " + r.label + ": " + r.count.toLocaleString('en-GB') + " (" + cp.toLocaleString('en-GB') + " CP)\n";
+        });
+      }
+
       if (numCmdrs > 1) {
-        window.discordCopyText += "\n👥 **Split between " + numCmdrs + " CMDRs**\n" +
+        taskText += "\n👥 **Split between " + numCmdrs + " CMDRs**\n" +
           "Goal per CMDR: " + Math.round(perCmdrRemaining).toLocaleString('en-GB') + " CP\n";
       }
-      
+
       var reqHeader = numCmdrs > 1 ? "Requirements per CMDR" : "Requirements";
-      window.discordCopyText += "\n📦 **" + reqHeader + " (Mix & Match)**\n" +
+      taskText += "\n📦 **" + reqHeader + " (Mix & Match, still needed)**\n" +
         "• 📁 Classified Data: " + document.getElementById('resClassified').textContent + "\n" +
         "• 🤝 Association / Political Data: " + document.getElementById('resAssociation').textContent + "\n" +
         "• 🔬 Research / Industrial Data: " + document.getElementById('resResearch').textContent + "\n" +
         "• 🔋 Power Commodities: " + document.getElementById('resCommodity').textContent + "\n";
+
+      window.discordTaskText = taskText;
+
+      // ── Inventory-only text ──
+      var invText = titleLine + "\n";
+      if (invScore > 0) {
+        invText += "Inventory Coverage: " + Math.round(invScore).toLocaleString('en-GB') + " CP\n";
+      }
+      if (numCmdrs > 1) {
+        invText += "Goal per CMDR: " + Math.round(perCmdrRemaining).toLocaleString('en-GB') + " CP\n";
+      } else {
+        invText += "Remaining Goal: " + Math.round(remainingScore).toLocaleString('en-GB') + " CP\n";
+      }
+
+      if (invRows.length > 0) {
+        invText += "\n🎒 **Your Current Inventory**\n";
+        invRows.forEach(function(r) {
+          var cp = Math.round(r.count * r.merits / 4);
+          invText += "• " + r.icon + " " + r.label + ": " + r.count.toLocaleString('en-GB') + " (" + cp.toLocaleString('en-GB') + " CP)\n";
+        });
+      } else {
+        invText += "\n🎒 No inventory entered yet.\n";
+      }
+
+      window.discordInventoryText = invText;
     }
 
     // System Name
@@ -988,13 +1177,157 @@
         calculate();
       });
     });
-    
+
     document.getElementById('clearInventory').addEventListener('click', function() {
       ['invClassified','invAssociation','invPolitical','invResearch','invIndustrial','invCommodity'].forEach(function(id) {
         document.getElementById(id).value = '';
       });
       saveInventory();
       calculate();
+      var ir = document.getElementById('importReadout');
+      ir.style.display = 'none';
+      ir.innerHTML = '';
+    });
+
+    // ── Import Info (from ShipLocker.json) ──
+    // Maps the game's internal "Name" fields (as written to
+    // ShipLocker.json) to this calculator's inventory buckets.
+    // Only OwnerID === 0 entries are counted — anything else is
+    // data/items owned by another CMDR/crewmate riding in your ship
+    // (e.g. in multicrew), which isn't yours to hand in and would
+    // otherwise inflate/skew your totals.
+
+    // "Data" array — Powerplay data types
+    var SHIPLOCKER_DATA_MAP = {
+      powerclassifieddata:   { field: 'invClassified',  label: 'Classified Data'  },
+      poweremployeedata:     { field: 'invAssociation', label: 'Association Data' },
+      powerpropagandadata:   { field: 'invPolitical',   label: 'Political Data'   },
+      powerresearchdata:     { field: 'invResearch',    label: 'Research Data'    },
+      powerfinancialrecords: { field: 'invIndustrial',  label: 'Industrial Data'  },
+    };
+
+    // "Items" array — on-foot Power Goods (all roll up into the single Commodity field)
+    var SHIPLOCKER_ITEMS_MAP = {
+      powerextraction:   'Extraction Sample',
+      powerindustrial:   'Industrial Component',
+      poweragriculture:  'Agricultural Sample',
+      powersecurity:     'Security Logs',
+      powermedical:      'Medical Sample',
+      powerresearch:     'Research Notes',
+      powercomputer:     'Computer Parts',
+      powerpower:        'Energy Regulator',
+      powermisccomputer: 'Data Storage Device',
+      powerinventory:    'Inventory Record',
+      powerelectronics:  'Electronics Package',
+      powerexperiment:   'Experiment Prototype',
+      powerplaymilitary: 'Military Schematic',
+      powerequipment:    'Personal Protective Equipment',
+    };
+
+    function populateGoodsList() {
+      var container = document.getElementById('goodsListContainer');
+      if (!container) return;
+      var dataNames = Object.keys(SHIPLOCKER_DATA_MAP).map(function(k) { return SHIPLOCKER_DATA_MAP[k].label; });
+      var itemNames = Object.keys(SHIPLOCKER_ITEMS_MAP).map(function(k) { return SHIPLOCKER_ITEMS_MAP[k]; });
+      container.innerHTML =
+        '<div style="margin-bottom:4px;"><strong style="color: var(--text-color);">Data (Classified / Association / Political / Research / Industrial):</strong> ' + dataNames.join(', ') + '</div>' +
+        '<div><strong style="color: var(--text-color);">Power Goods (rolled into &ldquo;Power Commodities&rdquo;):</strong> ' + itemNames.join(', ') + '</div>';
+    }
+
+    function handleShipLockerFile(file) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var readoutEl = document.getElementById('importReadout');
+        var json;
+        try {
+          json = JSON.parse(e.target.result);
+        } catch (err) {
+          readoutEl.style.display = 'block';
+          readoutEl.innerHTML = '&#9888; That file isn\'t valid JSON. Make sure you selected <code>ShipLocker.json</code>.';
+          return;
+        }
+
+        var hasData  = Array.isArray(json && json.Data);
+        var hasItems = Array.isArray(json && json.Items);
+        if (!json || (!hasData && !hasItems)) {
+          readoutEl.style.display = 'block';
+          readoutEl.innerHTML = '&#9888; That doesn\'t look like a <code>ShipLocker.json</code> file (no "Data" or "Items" array found).';
+          return;
+        }
+
+        var sums = { invClassified: 0, invAssociation: 0, invPolitical: 0, invResearch: 0, invIndustrial: 0, invCommodity: 0 };
+        var skippedCount = 0;
+        var unrecognized = {}; // Name -> count, for any power-prefixed entry we don't recognize yet
+
+        if (hasData) {
+          json.Data.forEach(function(item) {
+            var mapping = SHIPLOCKER_DATA_MAP[item.Name];
+            if (!mapping) {
+              if (/^power/i.test(item.Name || '')) unrecognized[item.Name] = (unrecognized[item.Name] || 0) + (item.Count || 0);
+              return;
+            }
+            if (item.OwnerID !== 0) { skippedCount += (item.Count || 0); return; }
+            sums[mapping.field] += (item.Count || 0);
+          });
+        }
+
+        if (hasItems) {
+          json.Items.forEach(function(item) {
+            if (!SHIPLOCKER_ITEMS_MAP.hasOwnProperty(item.Name)) {
+              if (/^power/i.test(item.Name || '')) unrecognized[item.Name] = (unrecognized[item.Name] || 0) + (item.Count || 0);
+              return;
+            }
+            if (item.OwnerID !== 0) { skippedCount += (item.Count || 0); return; }
+            sums.invCommodity += (item.Count || 0);
+          });
+        }
+
+        Object.keys(sums).forEach(function(field) {
+          document.getElementById(field).value = sums[field];
+        });
+        saveInventory();
+        calculate();
+
+        var msg = '&#10003; Imported from ShipLocker.json &mdash; ' +
+          sums.invClassified + ' Classified, ' +
+          sums.invAssociation + ' Association, ' +
+          sums.invPolitical + ' Political, ' +
+          sums.invResearch + ' Research, ' +
+          sums.invIndustrial + ' Industrial, ' +
+          sums.invCommodity + ' Power Goods.';
+        if (skippedCount > 0) {
+          msg += '<br>Skipped ' + skippedCount + ' item(s) owned by another CMDR/crewmate.';
+        }
+        var unrecKeys = Object.keys(unrecognized);
+        if (unrecKeys.length > 0) {
+          msg += '<br>&#9888; Found ' + unrecKeys.length + ' unrecognized Power-prefixed item type(s) not counted: ' +
+            unrecKeys.map(function(k) { return k + ' (' + unrecognized[k] + ')'; }).join(', ') +
+            '. Frontier may have added something new &mdash; let the page owner know so it can be added.';
+        }
+
+        readoutEl.style.display = 'block';
+        readoutEl.innerHTML = msg;
+      };
+      reader.onerror = function() {
+        var readoutEl = document.getElementById('importReadout');
+        readoutEl.style.display = 'block';
+        readoutEl.innerHTML = '&#9888; Couldn\'t read that file. Please try again.';
+      };
+      reader.readAsText(file);
+    }
+
+    var btnImportInfo   = document.getElementById('btnImportInfo');
+    var importFileInput = document.getElementById('importFileInput');
+
+    btnImportInfo.addEventListener('click', function() {
+      importFileInput.click();
+    });
+
+    importFileInput.addEventListener('change', function(e) {
+      if (e.target.files && e.target.files[0]) {
+        handleShipLockerFile(e.target.files[0]);
+      }
+      e.target.value = ''; // allow re-selecting the same file later
     });
 
     // Clear Form
@@ -1004,15 +1337,15 @@
         document.getElementById('systemName').value = '';
         var snLink = document.getElementById('systemInaraLink');
         if (snLink) snLink.style.display = 'none';
-        
+
         document.getElementById('controlScore').value = '';
-        
+
         document.getElementById('stateSelect').value = '';
         document.getElementById('statePct').value = '';
         document.getElementById('stateReadout').innerHTML = '';
-        
+
         document.getElementById('numCmdrs').value = '1';
-        
+
         activeMode = null;
         var bReinforce = document.getElementById('btnReinforce');
         var bUndermine = document.getElementById('btnUndermine');
@@ -1031,30 +1364,79 @@
           if (el) el.value = '';
         });
         saveInventory();
-        
+        var ir = document.getElementById('importReadout');
+        if (ir) { ir.style.display = 'none'; ir.innerHTML = ''; }
+
         calculate();
       });
     }
-    
+
     // Split input
     document.getElementById('numCmdrs').addEventListener('input', calculate);
 
-    // Discord Copy Button
+    // Shared clipboard-copy-with-feedback helper
+    function copyToClipboardWithFeedback(btn, text) {
+      if (!text) return;
+      navigator.clipboard.writeText(text).then(function() {
+        var orig = btn.innerHTML;
+        btn.innerHTML = '&#10003; Copied!';
+        btn.classList.add('copied-flash');
+        setTimeout(function() {
+          btn.innerHTML = orig;
+          btn.classList.remove('copied-flash');
+        }, 1800);
+      });
+    }
+
+    // Copy Task (full breakdown) button
     document.getElementById('btnCopyDiscord').addEventListener('click', function() {
-      if (window.discordCopyText) {
-        navigator.clipboard.writeText(window.discordCopyText).then(function() {
-          var btn = document.getElementById('btnCopyDiscord');
-          var orig = btn.innerHTML;
-          btn.innerHTML = '&#10003; Copied to clipboard!';
-          btn.style.color = '#fff';
-          btn.style.background = '#5865F2';
-          setTimeout(function() {
-            btn.innerHTML = orig;
-            btn.style.color = '#5865F2';
-            btn.style.background = 'rgba(88, 101, 242, 0.1)';
-          }, 2000);
-        });
-      }
+      copyToClipboardWithFeedback(this, window.discordTaskText);
+    });
+
+    // Copy Inventory (just what you're carrying) button
+    document.getElementById('btnCopyInventory').addEventListener('click', function() {
+      copyToClipboardWithFeedback(this, window.discordInventoryText);
+    });
+
+    // Copy Share Link button — encodes current inputs into the page URL
+    function buildShareURL() {
+      var params = new URLSearchParams();
+
+      var sn = document.getElementById('systemName').value.trim();
+      if (sn) params.set('sys', sn);
+
+      var cs = parseScore(document.getElementById('controlScore').value);
+      if (cs > 0) params.set('score', Math.round(cs));
+
+      var ss = document.getElementById('stateSelect').value;
+      if (ss) params.set('state', ss);
+
+      var sp = document.getElementById('statePct').value;
+      if (sp !== '') params.set('pct', sp);
+
+      var nc = document.getElementById('numCmdrs').value;
+      if (nc && nc !== '1') params.set('cmdrs', nc);
+
+      if (activeMode) params.set('mode', activeMode);
+
+      var m = getMerits();
+      if (m.classified  !== DEFAULTS.classified)  params.set('mc',   m.classified);
+      if (m.association !== DEFAULTS.association) params.set('ma',   m.association);
+      if (m.research     !== DEFAULTS.research)    params.set('mr',   m.research);
+      if (m.commodity     !== DEFAULTS.commodity)   params.set('mcom', m.commodity);
+
+      var invFields = { ic: 'invClassified', ia: 'invAssociation', ip: 'invPolitical', ir: 'invResearch', ii: 'invIndustrial', icom: 'invCommodity' };
+      Object.keys(invFields).forEach(function(key) {
+        var v = document.getElementById(invFields[key]).value;
+        if (v !== '') params.set(key, v);
+      });
+
+      var qs = params.toString();
+      return window.location.origin + window.location.pathname + (qs ? '?' + qs : '');
+    }
+
+    document.getElementById('btnCopyShareLink').addEventListener('click', function() {
+      copyToClipboardWithFeedback(this, buildShareURL());
     });
 
     // Reset button
@@ -1075,14 +1457,26 @@
       toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
 
-    // Info toggle
-    var infoToggle = document.getElementById('infoToggle');
-    var infoPanel  = document.getElementById('infoPanel');
+    // Info & Tips modal
+    var infoToggle      = document.getElementById('infoToggle');
+    var infoModalOverlay = document.getElementById('infoModalOverlay');
+    var infoModalClose  = document.getElementById('infoModalClose');
 
-    if (infoToggle && infoPanel) {
-      infoToggle.addEventListener('click', function() {
-        var open = infoPanel.classList.toggle('open');
-        infoToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    function openInfoModal() {
+      infoModalOverlay.classList.add('open');
+    }
+    function closeInfoModal() {
+      infoModalOverlay.classList.remove('open');
+    }
+
+    if (infoToggle && infoModalOverlay) {
+      infoToggle.addEventListener('click', openInfoModal);
+      infoModalClose.addEventListener('click', closeInfoModal);
+      infoModalOverlay.addEventListener('click', function(e) {
+        if (e.target === infoModalOverlay) closeInfoModal(); // click on backdrop, not the box
+      });
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && infoModalOverlay.classList.contains('open')) closeInfoModal();
       });
     }
 
@@ -1103,6 +1497,54 @@
     btnReinforce.addEventListener('click', function() { setMode('reinforce'); });
     btnUndermine.addEventListener('click', function() { setMode('undermine'); });
 
+    // Reads a shared link's query string (built by buildShareURL) and
+    // populates the form. Returns true if any recognized param was found.
+    function applyUrlParams() {
+      var params = new URLSearchParams(window.location.search);
+      if (Array.from(params.keys()).length === 0) return false;
+
+      if (params.has('sys')) {
+        var sn = params.get('sys');
+        var snInput = document.getElementById('systemName');
+        snInput.value = sn;
+        var snLink = document.getElementById('systemInaraLink');
+        if (sn.trim()) {
+          snLink.href = 'https://inara.cz/elite/starsystem/?search=' + encodeURIComponent(sn.trim());
+          snLink.style.display = 'flex';
+        }
+      }
+      if (params.has('score')) {
+        var scoreNum = parseInt(params.get('score'), 10);
+        if (!isNaN(scoreNum)) document.getElementById('controlScore').value = scoreNum.toLocaleString('en-GB');
+      }
+      if (params.has('state'))  document.getElementById('stateSelect').value = params.get('state');
+      if (params.has('pct'))    document.getElementById('statePct').value    = params.get('pct');
+      if (params.has('cmdrs'))  document.getElementById('numCmdrs').value    = params.get('cmdrs');
+
+      if (params.has('mode')) {
+        var mode = params.get('mode');
+        if (mode === 'reinforce' || mode === 'undermine') {
+          activeMode = mode;
+          btnReinforce.classList.toggle('active', activeMode === 'reinforce');
+          btnUndermine.classList.toggle('active', activeMode === 'undermine');
+          btnReinforce.setAttribute('aria-pressed', activeMode === 'reinforce' ? 'true' : 'false');
+          btnUndermine.setAttribute('aria-pressed', activeMode === 'undermine' ? 'true' : 'false');
+        }
+      }
+
+      if (params.has('mc'))   document.getElementById('meritClassified').value  = params.get('mc');
+      if (params.has('ma'))   document.getElementById('meritAssociation').value = params.get('ma');
+      if (params.has('mr'))   document.getElementById('meritResearch').value    = params.get('mr');
+      if (params.has('mcom')) document.getElementById('meritCommodity').value   = params.get('mcom');
+
+      var invFields = { ic: 'invClassified', ia: 'invAssociation', ip: 'invPolitical', ir: 'invResearch', ii: 'invIndustrial', icom: 'invCommodity' };
+      Object.keys(invFields).forEach(function(key) {
+        if (params.has(key)) document.getElementById(invFields[key]).value = params.get(key);
+      });
+
+      return true;
+    }
+
     /* ── Init: pull every default straight from CONFIG so there is
        a single source of truth. Previously the merit <input> tags
        had their own hardcoded "value" attributes that didn't match
@@ -1110,6 +1552,8 @@
        someone clicked "Reset to defaults". Fixed by setting them
        here instead of in the HTML. ── */
     function init() {
+      populateGoodsList();
+
       document.getElementById('meritClassified').value  = DEFAULTS.classified;
       document.getElementById('meritAssociation').value = DEFAULTS.association;
       document.getElementById('meritResearch').value    = DEFAULTS.research;
@@ -1170,7 +1614,18 @@
         }
       } catch (e) {}
 
-      calculate();
+      // A shared link takes priority over anything saved locally
+      var urlApplied = applyUrlParams();
+      if (urlApplied) {
+        saveOptions();
+        saveInventory();
+      }
+
+      if (document.getElementById('stateSelect').value && document.getElementById('statePct').value !== '') {
+        applyState();
+      } else {
+        calculate();
+      }
     }
 
     init();
