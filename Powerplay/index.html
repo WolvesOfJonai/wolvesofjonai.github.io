@@ -277,6 +277,54 @@
       text-transform: none;
     }
 
+    .btn-row-label {
+      flex-shrink: 0;
+      font-size: 0.68rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted-color);
+      white-space: nowrap;
+    }
+
+    /* Share Link — tinted with the site's own accent, since it hands off
+       the goal itself rather than posting to Discord */
+    .top-actions-row .btn-share {
+      border-color: rgba(62, 127, 193, 0.45);
+      color: var(--accent-color);
+      background: rgba(62, 127, 193, 0.08);
+    }
+
+    .top-actions-row .btn-share:hover {
+      border-color: var(--accent-color);
+      background: rgba(62, 127, 193, 0.16);
+    }
+
+    /* Copy Inv / Copy Task — Discord blurple, since that's what they're formatted for */
+    .top-actions-row .btn-discord {
+      border-color: rgba(88, 101, 242, 0.45);
+      color: #8f9bf5;
+      background: rgba(88, 101, 242, 0.08);
+    }
+
+    .top-actions-row .btn-discord:hover {
+      border-color: #5865F2;
+      color: #5865F2;
+      background: rgba(88, 101, 242, 0.16);
+    }
+
+    .top-actions-row .btn-discord:disabled {
+      color: var(--muted-color);
+      border-color: var(--border-color);
+      background: none;
+    }
+
+    .top-actions-row .btn-discord:disabled:hover {
+      color: var(--muted-color);
+      border-color: var(--border-color);
+      background: none;
+    }
+
     @media (max-width: 480px) {
       .top-actions-row .reset-btn {
         padding: 4px 6px;
@@ -286,6 +334,117 @@
       .top-actions-row {
         gap: 4px !important;
       }
+    }
+
+    .import-warning {
+      margin-top: 8px;
+      padding: 8px 10px;
+      background: rgba(255, 180, 50, 0.08);
+      border: 1px solid rgba(255, 180, 50, 0.3);
+      border-radius: 4px;
+      font-size: 0.72rem;
+      line-height: 1.5;
+      color: #ffb432;
+    }
+
+    /* ── FAQ accordion (Info & Tips modal) ── */
+    .faq-item {
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      margin-bottom: 8px;
+      overflow: hidden;
+    }
+
+    .faq-item summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 10px 14px;
+      font-size: 0.82rem;
+      font-weight: bold;
+      color: var(--text-color);
+      background: var(--settings-bg);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      transition: background 0.15s;
+    }
+
+    .faq-item summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .faq-item summary:hover {
+      background: #1f1f1f;
+    }
+
+    .faq-item summary::after {
+      content: '\25BE';
+      font-size: 0.8em;
+      color: var(--muted-color);
+      transition: transform 0.2s;
+      flex-shrink: 0;
+    }
+
+    .faq-item[open] summary::after {
+      transform: rotate(180deg);
+    }
+
+    .faq-item[open] summary {
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .faq-body {
+      padding: 12px 14px;
+      font-size: 0.78rem;
+      line-height: 1.55;
+    }
+
+    .faq-warning {
+      margin-top: 8px;
+      padding: 8px 10px;
+      background: rgba(255, 180, 50, 0.08);
+      border: 1px solid rgba(255, 180, 50, 0.3);
+      border-radius: 4px;
+      color: #ffb432;
+    }
+
+    /* ── Guide modal ── */
+    .guide-step {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .guide-step:last-child {
+      margin-bottom: 0;
+    }
+
+    .guide-step-num {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--accent-color);
+      color: #0d1a24;
+      font-weight: bold;
+      font-size: 0.78rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .guide-step-body h3 {
+      margin: 0 0 4px;
+      font-size: 0.85rem;
+      color: var(--text-color);
+    }
+
+    .guide-step-body p {
+      margin: 0;
+      font-size: 0.78rem;
+      line-height: 1.55;
+      color: var(--text-color);
     }
 
     .modal-overlay {
@@ -403,6 +562,12 @@
       color: var(--accent-color);
       font-size: 0.9rem;
       margin-top: auto;
+    }
+
+    .result-value-sub {
+      font-size: 0.65rem;
+      color: var(--muted-color);
+      margin-top: 2px;
     }
 
     /* ── Split Section ── */
@@ -625,14 +790,21 @@
 <body>
 
   <div class="container">
-    <div class="top-actions-row" style="display: flex; gap: 6px; justify-content: center; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 16px; padding-bottom: 2px;">
-      <button class="reset-btn" id="btnClearForm" style="flex-shrink: 0; white-space: nowrap;" title="Clear Form Data">&#10005; Clear</button>
+    <div class="top-actions-row" style="display: flex; gap: 6px; justify-content: center; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 8px; padding-bottom: 2px;">
+      <button class="reset-btn" id="guideToggle" style="flex-shrink: 0; white-space: nowrap;" title="How to Use This Site">&#128218; Guide</button>
       <button class="reset-btn" id="infoToggle" style="flex-shrink: 0; white-space: nowrap;" title="Information &amp; Tips">&#9432; Info</button>
-      <button class="reset-btn" id="btnCopyShareLink" style="flex-shrink: 0; white-space: nowrap;" title="Copy a link that pre-fills this page with your current inputs">&#128279; Link</button>
-      <button class="reset-btn" id="btnCopyInventory" style="flex-shrink: 0; white-space: nowrap;" title="Copy just your current inventory to Discord" disabled>&#127890; Inv</button>
-      <button class="reset-btn" id="btnCopyDiscord" style="flex-shrink: 0; white-space: nowrap;" title="Copy the full task breakdown to Discord" disabled>&#128203; Task</button>
+      <button class="reset-btn" id="btnClearForm" style="flex-shrink: 0; white-space: nowrap;" title="Clear Form Data">&#10005; Clear</button>
+    </div>
+    <div>
+      <div class="top-actions-row" style="display: flex; gap: 6px; justify-content: center; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 8px; padding-bottom: 2px;">
+      <span class="btn-row-label">(Hover over the buttons to find out more info)</span>
     </div>
 
+    <div class="top-actions-row" style="display: flex; align-items: center; gap: 6px; justify-content: center; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 16px; padding-bottom: 2px;">
+      <button class="reset-btn btn-share" id="btnCopyShareLink" style="flex-shrink: 0; white-space: nowrap;" title="Copy a link that pre-fills this page with your current inputs">&#128279; Share</button>
+      <button class="reset-btn btn-discord" id="btnCopyInventory" style="flex-shrink: 0; white-space: nowrap;" title="Copy just your current inventory to Discord" disabled>&#127890; Inv</button>
+      <button class="reset-btn btn-discord" id="btnCopyDiscord" style="flex-shrink: 0; white-space: nowrap;" title="Copy the full task breakdown to Discord" disabled>&#128203; Task</button>
+    </div>
     <h1>Data Calculator</h1>
 
     <!-- System Name and Control Score -->
@@ -746,13 +918,14 @@
           </div>
         </div>
         <div class="settings-footer" style="justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
-          <div style="font-size: 0.85rem; color: var(--muted-color);">Total Items: <strong id="invTotalCount" style="color: var(--text-color);">0</strong></div>
+          <div style="font-size: 0.85rem; color: var(--muted-color);">Total Items: <strong id="invTotalCount" style="color: var(--text-color);">0</strong> <span id="invTotalMerits"></span></div>
           <div style="display: flex; gap: 8px;">
             <input type="file" id="importFileInput" accept=".json,application/json" style="display: none;">
             <button class="reset-btn" id="btnImportInfo" title="Import your Data counts from ShipLocker.json">&#8593; Import Info</button>
             <button class="reset-btn" id="clearInventory">&#10005; Clear Inventory</button>
           </div>
         </div>
+        <div class="import-warning">&#9888; Only import if <em>everything</em> in your ShipLocker/backpack is meant for <strong>this</strong> system. The file doesn't record which system data or goods came from, so anything left over from another front gets counted here too.</div>
         <div id="importReadout" style="font-size: 0.72rem; color: var(--muted-color); margin-top: 8px; display: none; line-height: 1.5;"></div>
       </div>
     </div>
@@ -772,21 +945,25 @@
           <div class="result-label">Classified Data</div>
           <div class="result-merits" id="labelClassified"></div>
           <span class="result-value" id="resClassified">—</span>
+          <div class="result-value-sub" id="resClassifiedMerits"></div>
         </div>
         <div class="result-item">
           <div class="result-label">Association / Political Data</div>
           <div class="result-merits" id="labelAssociation"></div>
           <span class="result-value" id="resAssociation">—</span>
+          <div class="result-value-sub" id="resAssociationMerits"></div>
         </div>
         <div class="result-item">
           <div class="result-label">Research / Industrial Data</div>
           <div class="result-merits" id="labelResearch"></div>
           <span class="result-value" id="resResearch">—</span>
+          <div class="result-value-sub" id="resResearchMerits"></div>
         </div>
         <div class="result-item">
           <div class="result-label">Power Commodities</div>
           <div class="result-merits" id="labelCommodity"></div>
           <span class="result-value" id="resCommodity">—</span>
+          <div class="result-value-sub" id="resCommodityMerits"></div>
         </div>
       </div>
     </div>
@@ -800,67 +977,163 @@
         <button class="modal-close" id="infoModalClose" title="Close" aria-label="Close">&times;</button>
       </div>
       <div class="modal-body">
-        <span class="example">If you want to find out the system's % go to inara.cz then search the system and you'll see the % and the State. E.G Exploited 25.6%</span>
-        <br><br>
-        Note: Post-4&times; multiplier values. Control Points per delivery = Merits &divide; 4.
-        <br><br>
-        This page does remember what you have typed in to it so if you dont want it to remember the system name click clear form button.
-        <br><br>
-        <strong>Import Info:</strong> use the &ldquo;Import Info&rdquo; button in the Current Inventory section to auto-fill your Data <em>and</em> on-foot Power Goods counts from your game's <code>ShipLocker.json</code> file, instead of typing them in by hand.
-        <br><br>
-        You'll find <code>ShipLocker.json</code> in your Elite Dangerous saved games folder, alongside your Journal log files:
-        <br>
-        <code>C:\Users\&lt;YourUsername&gt;\Saved Games\Frontier Developments\Elite Dangerous\</code>
-        <br><br>
-        The game rewrites this file live, so grab the latest copy while docked or after visiting your ship locker/backpack. Only your own items (not a crewmate's) are imported &mdash; anything picked up by another CMDR riding in your ship is skipped automatically so it doesn't skew your totals.
-        <br><br>
-        <strong>Share Link:</strong> use the &ldquo;Share Link&rdquo; button up top to copy a URL that pre-fills this page with your system, score, mode, and inventory &mdash; handy for sending to squadmates.
-        <br><br>
-        <strong>What gets recognized from the ShipLocker file:</strong>
-        <div id="goodsListContainer" style="margin-top: 6px;"></div>
+
+        <details class="faq-item" open>
+          <summary>How do I find a system's Control Score / %?</summary>
+          <div class="faq-body">
+            Go to <strong>inara.cz</strong>, search the system, and you'll see its Powerplay state and progress, e.g. <em>Exploited 25.6%</em>. Either type the Control Score directly if you know it, or use the &ldquo;calculate from system state&rdquo; option and enter the state + that percentage instead.
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary>What's the difference between ConP and merits?</summary>
+          <div class="faq-body">
+            <strong>Merits</strong> are what you personally earn for a delivery. <strong>Control Points (ConP)</strong> are what actually move a system's score, and are worth a quarter of the merit value: <code>ConP per delivery = Merits &divide; 4</code>. All figures on this page are post-4&times; multiplier.
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary>How does Import Info work?</summary>
+          <div class="faq-body">
+            Click &ldquo;&#8593; Import Info&rdquo; in the Current Inventory section and select your <code>ShipLocker.json</code> file to auto-fill your Data <em>and</em> on-foot Power Goods counts, instead of typing them in by hand.
+            <br><br>
+            You'll find it in your Elite Dangerous saved games folder, alongside your Journal log files:
+            <br>
+            <code>C:\Users\&lt;YourUsername&gt;\Saved Games\Frontier Developments\Elite Dangerous\</code>
+            <br><br>
+            The game rewrites this file live, so grab the latest copy while docked or after visiting your ship locker/backpack. Only your own items (not a crewmate's) are imported &mdash; anything picked up by another CMDR riding in your ship is skipped automatically so it doesn't skew your totals.
+            <div class="faq-warning">
+              &#9888; <strong>Only import if everything in the file is meant for this system.</strong> <code>ShipLocker.json</code> doesn't record which star system your Data or Goods came from &mdash; there's no way for this page (or any tool) to tell. If you're working multiple Powerplay fronts at once and haven't handed in or dropped off items from an earlier system, importing will count that leftover stock toward this one too and inflate your totals.
+            </div>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary>What gets recognized from the ShipLocker file?</summary>
+          <div class="faq-body">
+            <div id="goodsListContainer"></div>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary>What does the Share Link button do?</summary>
+          <div class="faq-body">
+            Copies a URL that pre-fills this page with the system, score/state, mode, and CMDR split &mdash; handy for sending to squadmates. It deliberately leaves out inventory, so opening someone else's link won't overwrite your own saved counts.
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary>Does this page save my data?</summary>
+          <div class="faq-body">
+            Yes, locally in your browser only (nothing is sent anywhere else). That's why the &ldquo;Clear&rdquo; button exists at the top &mdash; use it if you don't want the system name or inventory remembered for next time.
+          </div>
+        </details>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Guide modal -->
+  <div id="guideModalOverlay" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2>&#128218; How to Use This Site</h2>
+        <button class="modal-close" id="guideModalClose" title="Close" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+
+        <div class="guide-step">
+          <div class="guide-step-num">1</div>
+          <div class="guide-step-body">
+            <h3>Set your target</h3>
+            <p>Type the System Name and either paste in its Control Score directly, or use &ldquo;calculate from system state&rdquo; and pick the state + progress % shown on inara.cz.</p>
+          </div>
+        </div>
+
+        <div class="guide-step">
+          <div class="guide-step-num">2</div>
+          <div class="guide-step-body">
+            <h3>(Optional) Pick Reinforce or Undermine</h3>
+            <p>Only toggle one of these if you're pushing the score up or tearing it down rather than a neutral acquisition &mdash; it applies the &plusmn;15% merit modifier everywhere on the page.</p>
+          </div>
+        </div>
+
+        <div class="guide-step">
+          <div class="guide-step-num">3</div>
+          <div class="guide-step-body">
+            <h3>Add your inventory</h3>
+            <p>Type your Data/Goods counts in manually, or click &ldquo;&#8593; Import Info&rdquo; and select your <code>ShipLocker.json</code> file to fill them in automatically. Only import if everything in it is meant for this system &mdash; see the Info &amp; Tips FAQ for why.</p>
+          </div>
+        </div>
+
+        <div class="guide-step">
+          <div class="guide-step-num">4</div>
+          <div class="guide-step-body">
+            <h3>Split between CMDRs (if working as a squad)</h3>
+            <p>Set how many CMDRs are contributing and the results grid will show what's needed per person instead of the total.</p>
+          </div>
+        </div>
+
+        <div class="guide-step">
+          <div class="guide-step-num">5</div>
+          <div class="guide-step-body">
+            <h3>Read your results</h3>
+            <p>The four cards show how many pieces of each Data/Goods type are still needed to hit the goal, and roughly how many merits you'd earn if you filled the remaining goal with that category alone.</p>
+          </div>
+        </div>
+
+        <div class="guide-step">
+          <div class="guide-step-num">6</div>
+          <div class="guide-step-body">
+            <h3>Share it</h3>
+            <p>Use &ldquo;Copy Task&rdquo; to post the full breakdown to Discord, &ldquo;Copy Inventory&rdquo; to just post what you're currently carrying, or &ldquo;Share Link&rdquo; to hand the goal itself off to squadmates.</p>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
 
   <script>
     /* ============================================================
-        CONFIG — edit these values when Frontier patches the game.
-        Everything on the page (input defaults, tooltip labels,
-        mode badges, results) is derived from this object, so
-        changing a number here is the only edit you need to make.
+        CONFIG now lives in config.json, next to this file — edit
+        the numbers there when Frontier patches the game; no HTML/JS
+        editing needed. FALLBACK_CONFIG below is only used if that
+        file can't be fetched (e.g. opening this page locally via
+        file://, where browsers block loading local JSON), so the
+        page still works even without it.
         ============================================================ */
-    var CONFIG = {
-
-      // Merit value per delivery (post-4x multiplier era)
+    var FALLBACK_CONFIG = {
       merits: {
         classified:  486,   // Power Classified Data
         association: 324,   // Power Association / Political Data
         research:    324,   // Power Research / Industrial Data
-        commodity:    82,   // Powerplay Goods / Commodities
+        commodity:    85,   // Powerplay Goods / Commodities
       },
-
-      // Control-point score ceiling for each system tier
-      // (% shown in-game = current score ÷ tier max)
       tiers: {
         exploited:  350000,
         fortified:  650000,
         stronghold: 1000000,
       },
-
-      // Reinforce / Undermine merit multipliers
       reinforceMultiplier: 0.85,   // -15%
       undermineMultiplier: 1.15,   // +15%
-
     };
     /* ============================================================ */
 
-    // Internal — derived from CONFIG, do not edit below this line
-    var TIERS = {
-      exploited:  { max: CONFIG.tiers.exploited,  label: 'Exploited',  badge: 'badge-exploited'  },
-      fortified:  { max: CONFIG.tiers.fortified,  label: 'Fortified',  badge: 'badge-fortified'  },
-      stronghold: { max: CONFIG.tiers.stronghold, label: 'Stronghold', badge: 'badge-stronghold' },
-    };
-    var DEFAULTS    = CONFIG.merits;
+    // Internal — derived from CONFIG once it's loaded, do not edit below this line
+    var CONFIG, TIERS, DEFAULTS, SCORE_CAP;
+
+    function applyConfig(cfg) {
+      CONFIG = cfg;
+      TIERS = {
+        exploited:  { max: CONFIG.tiers.exploited,  label: 'Exploited',  badge: 'badge-exploited'  },
+        fortified:  { max: CONFIG.tiers.fortified,  label: 'Fortified',  badge: 'badge-fortified'  },
+        stronghold: { max: CONFIG.tiers.stronghold, label: 'Stronghold', badge: 'badge-stronghold' },
+      };
+      DEFAULTS  = CONFIG.merits;
+      SCORE_CAP = CONFIG.tiers.stronghold * 4; // hard ceiling — 4x Stronghold max
+    }
+
     var activeMode  = null; // null | 'reinforce' | 'undermine'
 
     var itemsNeeded = function(score, merits) {
@@ -899,8 +1172,6 @@
         commodity:   parseInt(document.getElementById('invCommodity').value,   10) || 0,
       };
     }
-
-    var SCORE_CAP = CONFIG.tiers.stronghold * 4; // hard ceiling — 4x Stronghold max
 
     function saveOptions() {
       var sn = document.getElementById('systemName');
@@ -942,6 +1213,14 @@
       el.setSelectionRange(pos, pos);
     }
 
+    // Discord renders <t:UNIX:STYLE> as a live, auto-localized timestamp for
+    // whoever reads it — no timezone math needed, and :R shows/keeps updating
+    // as relative time (e.g. "3 minutes ago"). Styles: f = date+time, R = relative.
+    function discordTimestamp(style) {
+      var unix = Math.floor(Date.now() / 1000);
+      return '<t:' + unix + ':' + style + '>';
+    }
+
     function calculate() {
       saveOptions();
       var score = parseScore(document.getElementById('controlScore').value);
@@ -949,7 +1228,6 @@
       var mult  = getMultiplier();
       var inv   = getInventory();
       var totalItems = inv.classified + inv.association + inv.research + inv.commodity;
-      document.getElementById('invTotalCount').textContent = totalItems.toLocaleString('en-GB');
 
       // Effective merits after mode multiplier
       var eff = {
@@ -959,19 +1237,31 @@
         commodity:   m.commodity   * mult,
       };
 
+      var totalMerits = Math.round(
+        inv.classified  * eff.classified +
+        inv.association * eff.association +
+        inv.research    * eff.research +
+        inv.commodity    * eff.commodity
+      );
+      document.getElementById('invTotalCount').textContent = totalItems.toLocaleString('en-GB');
+      document.getElementById('invTotalMerits').textContent = totalItems > 0 ? '(' + totalMerits.toLocaleString('en-GB') + ' merits)' : '';
+
       // Sub-labels: show base merits and effective CP
       var modeTag = activeMode === 'reinforce' ? ' <span style="color:#ff5555">(&#x00D7;' + CONFIG.reinforceMultiplier + ')</span>'
                   : activeMode === 'undermine' ? ' <span style="color:#44dd44">(&#x00D7;' + CONFIG.undermineMultiplier + ')</span>'
                   : '';
 
-      document.getElementById('labelClassified').innerHTML  = m.classified  + ' merits' + modeTag + ' &middot; ' + fmtCP(m.classified,  mult) + ' CP each';
-      document.getElementById('labelAssociation').innerHTML = m.association + ' merits' + modeTag + ' &middot; ' + fmtCP(m.association, mult) + ' CP each';
-      document.getElementById('labelResearch').innerHTML    = m.research    + ' merits' + modeTag + ' &middot; ' + fmtCP(m.research,    mult) + ' CP each';
-      document.getElementById('labelCommodity').innerHTML   = m.commodity   + ' merits' + modeTag + ' &middot; ' + fmtCP(m.commodity,   mult) + ' CP each';
+      document.getElementById('labelClassified').innerHTML  = m.classified  + ' merits' + modeTag + ' &middot; ' + fmtCP(m.classified,  mult) + ' ConP each';
+      document.getElementById('labelAssociation').innerHTML = m.association + ' merits' + modeTag + ' &middot; ' + fmtCP(m.association, mult) + ' ConP each';
+      document.getElementById('labelResearch').innerHTML    = m.research    + ' merits' + modeTag + ' &middot; ' + fmtCP(m.research,    mult) + ' ConP each';
+      document.getElementById('labelCommodity').innerHTML   = m.commodity   + ' merits' + modeTag + ' &middot; ' + fmtCP(m.commodity,   mult) + ' ConP each';
 
       if (score <= 0) {
         ['resClassified','resAssociation','resResearch','resCommodity'].forEach(function(id) {
           document.getElementById(id).textContent = '—';
+        });
+        ['resClassifiedMerits','resAssociationMerits','resResearchMerits','resCommodityMerits'].forEach(function(id) {
+          document.getElementById(id).textContent = '';
         });
         document.getElementById('remainingReadout').style.display = 'none';
         document.getElementById('btnCopyDiscord').disabled = true;
@@ -987,22 +1277,23 @@
 
       var remainingScore = Math.max(0, score - invScore);
 
-      var overallText = 'Total System Target: <strong>' + Math.round(score).toLocaleString('en-GB') + '</strong> CP<br>';
+      var overallText = 'Total System Target: <strong>' + Math.round(score).toLocaleString('en-GB') + '</strong> ConP<br>';
       if (invScore > 0) {
         var progressPct = Math.min(100, (invScore / score) * 100);
-        overallText += 'Inventory covers: <strong style="color: var(--accent-color);">' + Math.round(invScore).toLocaleString('en-GB') + '</strong> CP ' +
-          '<span style="color: var(--muted-color);">(' + progressPct.toFixed(1) + '% of goal)</span><br>';
+        var invMerits = Math.round(invScore * 4);
+        overallText += 'Inventory covers: <strong style="color: var(--accent-color);">' + Math.round(invScore).toLocaleString('en-GB') + '</strong> ConP ' +
+          '<span style="color: var(--muted-color);">(' + invMerits.toLocaleString('en-GB') + ' merits &middot; ' + progressPct.toFixed(1) + '% of goal)</span><br>';
         overallText += '<div style="height:6px;border-radius:3px;background:var(--input-bg);overflow:hidden;margin:4px 0 8px;">' +
           '<div style="height:100%;width:' + progressPct.toFixed(1) + '%;background:var(--accent-color);"></div></div>';
       }
-      overallText += 'Remaining Goal: <strong>' + Math.round(remainingScore).toLocaleString('en-GB') + '</strong> CP';
+      overallText += 'Remaining Goal: <strong>' + Math.round(remainingScore).toLocaleString('en-GB') + '</strong> ConP';
 
       var numCmdrs = Math.max(1, parseInt(document.getElementById('numCmdrs').value, 10) || 1);
       var perCmdrText = numCmdrs > 1 ? ' (each)' : '';
       var perCmdrRemaining = remainingScore / numCmdrs;
 
       if (numCmdrs > 1) {
-        overallText += '<br>Goal per CMDR: <strong style="color: var(--accent-color);">' + Math.round(perCmdrRemaining).toLocaleString('en-GB') + '</strong> CP';
+        overallText += '<br>Goal per CMDR: <strong style="color: var(--accent-color);">' + Math.round(perCmdrRemaining).toLocaleString('en-GB') + '</strong> ConP';
       }
 
       var readoutEl = document.getElementById('remainingReadout');
@@ -1013,6 +1304,12 @@
       document.getElementById('resAssociation').textContent = itemsNeeded(perCmdrRemaining, eff.association).toLocaleString() + ' pieces' + perCmdrText;
       document.getElementById('resResearch').textContent    = itemsNeeded(perCmdrRemaining, eff.research).toLocaleString()    + ' pieces' + perCmdrText;
       document.getElementById('resCommodity').textContent   = itemsNeeded(perCmdrRemaining, eff.commodity).toLocaleString()   + ' units' + perCmdrText;
+
+      // How many merits you'd earn if that category alone covered the (per-CMDR) goal
+      document.getElementById('resClassifiedMerits').textContent  = '≈ ' + Math.round(itemsNeeded(perCmdrRemaining, eff.classified)  * eff.classified).toLocaleString('en-GB')  + ' merits';
+      document.getElementById('resAssociationMerits').textContent = '≈ ' + Math.round(itemsNeeded(perCmdrRemaining, eff.association) * eff.association).toLocaleString('en-GB') + ' merits';
+      document.getElementById('resResearchMerits').textContent    = '≈ ' + Math.round(itemsNeeded(perCmdrRemaining, eff.research)    * eff.research).toLocaleString('en-GB')    + ' merits';
+      document.getElementById('resCommodityMerits').textContent   = '≈ ' + Math.round(itemsNeeded(perCmdrRemaining, eff.commodity)   * eff.commodity).toLocaleString('en-GB')   + ' merits';
 
       document.getElementById('btnCopyDiscord').disabled = false;
       document.getElementById('btnCopyInventory').disabled = false;
@@ -1039,61 +1336,70 @@
         { icon: '🏭', label: 'Industrial Data',    count: parseInt(document.getElementById('invIndustrial').value, 10)  || 0, merits: eff.research },
         { icon: '🔋', label: 'Power Commodities',  count: parseInt(document.getElementById('invCommodity').value, 10)   || 0, merits: eff.commodity },
       ].filter(function(r) { return r.count > 0; });
+      var invTotalMerits = invRows.reduce(function(sum, r) { return sum + Math.round(r.count * r.merits); }, 0);
 
       // ── Full task text ──
       var taskText = titleLine + "\n";
 
       taskText += "\n📊 **Score Breakdown**\n" +
-        "Total Target: " + Math.round(score).toLocaleString('en-GB') + " CP\n";
+        "Total Target: " + Math.round(score).toLocaleString('en-GB') + " ConP\n";
 
       if (invScore > 0) {
         var discordPct = Math.min(100, (invScore / score) * 100);
-        taskText += "Inventory Coverage: " + Math.round(invScore).toLocaleString('en-GB') + " CP\n" +
+        taskText += "Inventory Coverage: " + Math.round(invScore).toLocaleString('en-GB') + " ConP (" + invTotalMerits.toLocaleString('en-GB') + " merits)\n" +
           textProgressBar(discordPct) + " " + discordPct.toFixed(1) + "%\n";
       }
-      taskText += "Remaining Goal: " + Math.round(remainingScore).toLocaleString('en-GB') + " CP\n";
+      taskText += "Remaining Goal: " + Math.round(remainingScore).toLocaleString('en-GB') + " ConP\n";
 
       if (invRows.length > 0) {
         taskText += "\n🎒 **Your Current Inventory**\n";
         invRows.forEach(function(r) {
           var cp = Math.round(r.count * r.merits / 4);
-          taskText += "• " + r.icon + " " + r.label + ": " + r.count.toLocaleString('en-GB') + " (" + cp.toLocaleString('en-GB') + " CP)\n";
+          var merits = Math.round(r.count * r.merits);
+          taskText += "• " + r.icon + " " + r.label + ": " + r.count.toLocaleString('en-GB') + " (" + merits.toLocaleString('en-GB') + " merits, " + cp.toLocaleString('en-GB') + " ConP)\n";
         });
       }
 
       if (numCmdrs > 1) {
         taskText += "\n👥 **Split between " + numCmdrs + " CMDRs**\n" +
-          "Goal per CMDR: " + Math.round(perCmdrRemaining).toLocaleString('en-GB') + " CP\n";
+          "Goal per CMDR: " + Math.round(perCmdrRemaining).toLocaleString('en-GB') + " ConP\n";
       }
 
       var reqHeader = numCmdrs > 1 ? "Requirements per CMDR" : "Requirements";
       taskText += "\n📦 **" + reqHeader + " (Mix & Match, still needed)**\n" +
-        "• 📁 Classified Data: " + document.getElementById('resClassified').textContent + "\n" +
-        "• 🤝 Association / Political Data: " + document.getElementById('resAssociation').textContent + "\n" +
-        "• 🔬 Research / Industrial Data: " + document.getElementById('resResearch').textContent + "\n" +
-        "• 🔋 Power Commodities: " + document.getElementById('resCommodity').textContent + "\n";
+        "• 📁 Classified Data: " + document.getElementById('resClassified').textContent + " (" + document.getElementById('resClassifiedMerits').textContent + ")\n" +
+        "• 🤝 Association / Political Data: " + document.getElementById('resAssociation').textContent + " (" + document.getElementById('resAssociationMerits').textContent + ")\n" +
+        "• 🔬 Research / Industrial Data: " + document.getElementById('resResearch').textContent + " (" + document.getElementById('resResearchMerits').textContent + ")\n" +
+        "• 🔋 Power Commodities: " + document.getElementById('resCommodity').textContent + " (" + document.getElementById('resCommodityMerits').textContent + ")\n";
 
       window.discordTaskText = taskText;
 
       // ── Inventory-only text ──
       var invText = titleLine + "\n";
       if (invScore > 0) {
-        invText += "Inventory Coverage: " + Math.round(invScore).toLocaleString('en-GB') + " CP\n";
+        invText += "Inventory Coverage: " + Math.round(invScore).toLocaleString('en-GB') + " ConP (" + invTotalMerits.toLocaleString('en-GB') + " merits)\n";
       }
       if (numCmdrs > 1) {
-        invText += "Goal per CMDR: " + Math.round(perCmdrRemaining).toLocaleString('en-GB') + " CP\n";
+        invText += "Goal per CMDR: " + Math.round(perCmdrRemaining).toLocaleString('en-GB') + " ConP\n";
       } else {
-        invText += "Remaining Goal: " + Math.round(remainingScore).toLocaleString('en-GB') + " CP\n";
+        invText += "Remaining Goal: " + Math.round(remainingScore).toLocaleString('en-GB') + " ConP\n";
       }
 
       if (invRows.length > 0) {
-        invText += "\n🎒 **Your Current Inventory**\n";
+        var labelWidth = invRows.reduce(function(w, r) { return Math.max(w, r.label.length); }, 0) + 1;
+        var countWidth  = invRows.reduce(function(w, r) { return Math.max(w, r.count.toLocaleString('en-GB').length); }, 0);
+
+        invText += "\nMy Current Inventory - " + discordTimestamp('f') + " (" + discordTimestamp('R') + ")\n```\n";
         invRows.forEach(function(r) {
           var cp = Math.round(r.count * r.merits / 4);
-          invText += "• " + r.icon + " " + r.label + ": " + r.count.toLocaleString('en-GB') + " (" + cp.toLocaleString('en-GB') + " CP)\n";
+          var merits = Math.round(r.count * r.merits);
+          invText += (r.label + ':').padEnd(labelWidth + 1) + ' ' +
+            r.count.toLocaleString('en-GB').padStart(countWidth) +
+            '  (' + merits.toLocaleString('en-GB') + ' merits, ' + cp.toLocaleString('en-GB') + ' ConP)\n';
         });
+        invText += "```";
       } else {
-        invText += "\n🎒 No inventory entered yet.\n";
+        invText += "\nNo inventory entered yet.\n";
       }
 
       window.discordInventoryText = invText;
@@ -1216,6 +1522,7 @@
       powerresearch:     'Research Notes',
       powercomputer:     'Computer Parts',
       powerpower:        'Energy Regulator',
+      powermachinery:    'Industrial Machinery',
       powermisccomputer: 'Data Storage Device',
       powerinventory:    'Inventory Record',
       powerelectronics:  'Electronics Package',
@@ -1425,14 +1732,23 @@
       if (m.research     !== DEFAULTS.research)    params.set('mr',   m.research);
       if (m.commodity     !== DEFAULTS.commodity)   params.set('mcom', m.commodity);
 
-      var invFields = { ic: 'invClassified', ia: 'invAssociation', ip: 'invPolitical', ir: 'invResearch', ii: 'invIndustrial', icom: 'invCommodity' };
-      Object.keys(invFields).forEach(function(key) {
-        var v = document.getElementById(invFields[key]).value;
-        if (v !== '') params.set(key, v);
-      });
+      // Deliberately NOT included: your personal inventory counts (ic/ia/ip/ir/ii/icom).
+      // A share link is meant to hand off the *goal*, not your ShipLocker contents —
+      // and opening a link with those params would overwrite the recipient's own
+      // saved inventory in their browser.
 
       var qs = params.toString();
-      return window.location.origin + window.location.pathname + (qs ? '?' + qs : '');
+
+      // window.location.origin/pathname come back as "null"/"srcdoc" inside a
+      // sandboxed preview (e.g. an about:srcdoc iframe), which would otherwise
+      // produce a garbage link like "nullsrcdoc?...". Fall back to just the
+      // query string in that case so it can be appended to the real hosted URL.
+      var origin = window.location.origin;
+      var isSandboxed = !origin || origin === 'null' || window.location.pathname === 'srcdoc' || window.location.protocol === 'about:';
+      if (isSandboxed) {
+        return qs ? '?' + qs : '';
+      }
+      return origin + window.location.pathname + (qs ? '?' + qs : '');
     }
 
     document.getElementById('btnCopyShareLink').addEventListener('click', function() {
@@ -1457,28 +1773,28 @@
       toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
 
-    // Info & Tips modal
-    var infoToggle      = document.getElementById('infoToggle');
-    var infoModalOverlay = document.getElementById('infoModalOverlay');
-    var infoModalClose  = document.getElementById('infoModalClose');
+    // Info & Tips / Guide modals — shared wiring
+    function setupModal(toggleId, overlayId, closeId) {
+      var toggle  = document.getElementById(toggleId);
+      var overlay = document.getElementById(overlayId);
+      var close   = document.getElementById(closeId);
+      if (!toggle || !overlay || !close) return;
 
-    function openInfoModal() {
-      infoModalOverlay.classList.add('open');
-    }
-    function closeInfoModal() {
-      infoModalOverlay.classList.remove('open');
-    }
+      function open()  { overlay.classList.add('open'); }
+      function shut()  { overlay.classList.remove('open'); }
 
-    if (infoToggle && infoModalOverlay) {
-      infoToggle.addEventListener('click', openInfoModal);
-      infoModalClose.addEventListener('click', closeInfoModal);
-      infoModalOverlay.addEventListener('click', function(e) {
-        if (e.target === infoModalOverlay) closeInfoModal(); // click on backdrop, not the box
+      toggle.addEventListener('click', open);
+      close.addEventListener('click', shut);
+      overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) shut(); // click on backdrop, not the box
       });
       document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && infoModalOverlay.classList.contains('open')) closeInfoModal();
+        if (e.key === 'Escape' && overlay.classList.contains('open')) shut();
       });
     }
+
+    setupModal('infoToggle',  'infoModalOverlay',  'infoModalClose');
+    setupModal('guideToggle', 'guideModalOverlay', 'guideModalClose');
 
     // Reinforce / Undermine buttons
     var btnReinforce = document.getElementById('btnReinforce');
@@ -1537,10 +1853,9 @@
       if (params.has('mr'))   document.getElementById('meritResearch').value    = params.get('mr');
       if (params.has('mcom')) document.getElementById('meritCommodity').value   = params.get('mcom');
 
-      var invFields = { ic: 'invClassified', ia: 'invAssociation', ip: 'invPolitical', ir: 'invResearch', ii: 'invIndustrial', icom: 'invCommodity' };
-      Object.keys(invFields).forEach(function(key) {
-        if (params.has(key)) document.getElementById(invFields[key]).value = params.get(key);
-      });
+      // Note: ic/ia/ip/ir/ii/icom (personal inventory) are intentionally NOT read
+      // from share links, even if an older link happens to include them — a shared
+      // link should only ever set the goal, never overwrite someone's own inventory.
 
       return true;
     }
@@ -1593,7 +1908,20 @@
           if (savedOpts.meritClassified !== undefined) document.getElementById('meritClassified').value = savedOpts.meritClassified;
           if (savedOpts.meritAssociation !== undefined) document.getElementById('meritAssociation').value = savedOpts.meritAssociation;
           if (savedOpts.meritResearch !== undefined) document.getElementById('meritResearch').value = savedOpts.meritResearch;
-          if (savedOpts.meritCommodity !== undefined) document.getElementById('meritCommodity').value = savedOpts.meritCommodity;
+          if (savedOpts.meritCommodity !== undefined) {
+            // KNOWN_STALE_DEFAULTS: previous CONFIG defaults that turned out to be
+            // wrong and were corrected. If someone's saved value exactly matches an
+            // old default (meaning they never customized it — the page just cached
+            // whatever the default was at the time), silently carry them forward to
+            // the current default instead of freezing them on the outdated number.
+            var KNOWN_STALE_COMMODITY_DEFAULTS = [82];
+            var savedCommodity = parseInt(savedOpts.meritCommodity, 10);
+            if (KNOWN_STALE_COMMODITY_DEFAULTS.indexOf(savedCommodity) !== -1) {
+              document.getElementById('meritCommodity').value = DEFAULTS.commodity;
+            } else {
+              document.getElementById('meritCommodity').value = savedOpts.meritCommodity;
+            }
+          }
 
           if (savedOpts.stateSelect || savedOpts.statePct) {
             applyState();
@@ -1628,7 +1956,25 @@
       }
     }
 
-    init();
+    function bootstrap() {
+      fetch('config.json', { cache: 'no-store' })
+        .then(function(resp) {
+          if (!resp.ok) throw new Error('config.json returned ' + resp.status);
+          return resp.json();
+        })
+        .then(function(cfg) {
+          if (!cfg || !cfg.merits || !cfg.tiers) throw new Error('config.json is missing required fields');
+          applyConfig(cfg);
+          init();
+        })
+        .catch(function(err) {
+          console.warn('Could not load config.json (' + err.message + ') — using built-in fallback values.');
+          applyConfig(FALLBACK_CONFIG);
+          init();
+        });
+    }
+
+    bootstrap();
   </script>
 
 </body>

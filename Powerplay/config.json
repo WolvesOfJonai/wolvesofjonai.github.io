@@ -1,0 +1,20 @@
+{
+  "_readme": "Edit the numbers below whenever Frontier changes Powerplay merit values or tier thresholds. Save this file and refresh the page — no HTML/JS editing needed. Comments aren't valid JSON, so this _readme field is just documentation; the page ignores it.",
+  "_lastUpdated": "2026-07-28",
+
+  "merits": {
+    "classified": 486,
+    "association": 324,
+    "research": 324,
+    "commodity": 85
+  },
+
+  "tiers": {
+    "exploited": 350000,
+    "fortified": 650000,
+    "stronghold": 1000000
+  },
+
+  "reinforceMultiplier": 0.85,
+  "undermineMultiplier": 1.15
+}
