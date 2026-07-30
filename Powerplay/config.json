@@ -6,7 +6,9 @@
     "classified": 486,
     "association": 324,
     "research": 324,
-    "commodity": 82
+    "commodity": 82,
+    "tracker": 0,
+    "injection": 0
   },
 
   "tiers": {
