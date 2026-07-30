@@ -18,7 +18,7 @@
   },
 
   "_acquireNote": "Acquire is known to have SOME bonus multiplier but the exact value hasn't been confirmed yet — acquireMultiplier below is a 1.0 (no bonus) placeholder until it's known.",
-  "acquireMultiplier": 1.0,
+  "acquireMultiplier": 1,
   "reinforceMultiplier": 0.65,
   "undermineMultiplier": 1.15
 }

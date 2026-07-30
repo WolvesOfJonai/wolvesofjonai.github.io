@@ -828,25 +828,24 @@
   </style>
 </head>
 <body>
-
+  
   <div class="container">
+    <h1>Data Calculator</h1>
+    <div class="top-actions-row" style="display: flex; align-items: center; gap: 6px; justify-content: center; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 16px; padding-bottom: 2px;">
+      Hover over the buttons below to find out what they do or click Guide.
+    </div>
     <div class="top-actions-row" style="display: flex; gap: 6px; justify-content: center; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 8px; padding-bottom: 2px;">
       <button class="reset-btn" id="btnClearForm" style="flex-shrink: 0; white-space: nowrap;" title="Clear Form Data">&#10005; Clear</button>
       <button class="reset-btn" id="guideToggle" style="flex-shrink: 0; white-space: nowrap;" title="How to Use This Site">&#128218; Guide</button>
       <button class="reset-btn" id="infoToggle" style="flex-shrink: 0; white-space: nowrap;" title="Information &amp; Tips">&#9432; Info</button>
     </div>
-    <div>
-      <div class="top-actions-row" style="display: flex; gap: 6px; justify-content: center; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 8px; padding-bottom: 2px;">
-      <span class="btn-row-label">(Hover over the buttons to find out more info)</span>
-    </div>
+
     <div class="top-actions-row" style="display: flex; align-items: center; gap: 6px; justify-content: center; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 16px; padding-bottom: 2px;">
       <span class="btn-row-label">Share:</span>
       <button class="reset-btn btn-share" id="btnCopyShareLink" style="flex-shrink: 0; white-space: nowrap;" title="Copy a link that pre-fills this page with your current inputs">&#128279; Link</button>
       <button class="reset-btn btn-discord" id="btnCopyInventory" style="flex-shrink: 0; white-space: nowrap;" title="Copy just your current inventory to Discord" disabled>&#127890; Inv</button>
       <button class="reset-btn btn-discord" id="btnCopyDiscord" style="flex-shrink: 0; white-space: nowrap;" title="Copy the full task breakdown to Discord" disabled>&#128203; Task</button>
     </div>
-
-    <h1>Data Calculator</h1>
 
     <!-- System Name and Control Score -->
     <div style="display: flex; gap: 16px; margin-bottom: 20px;">
@@ -881,7 +880,7 @@
           <div class="state-pct-wrap">
             <label for="fromStatePct">Progress</label>
             <div class="pct-wrap-inner">
-              <input type="number" id="fromStatePct" min="0" max="100" step="1" placeholder="0">
+              <input type="number" id="fromStatePct" min="-100" max="100" step="1" placeholder="0">
               <span class="pct-symbol">%</span>
             </div>
           </div>
@@ -906,7 +905,7 @@
           <div class="state-pct-wrap">
             <label for="statePct">Progress</label>
             <div class="pct-wrap-inner">
-              <input type="number" id="statePct" min="0" max="100" step="1" placeholder="0">
+              <input type="number" id="statePct" min="-100" max="100" step="1" placeholder="0">
               <span class="pct-symbol">%</span>
             </div>
           </div>
@@ -1001,12 +1000,12 @@
           <div class="merit-field">
             <label for="invInjection">Injection Malware <span class="placeholder-badge" title="Only usable for Acquire">A only</span></label>
             <input type="number" id="invInjection" min="0" step="1" placeholder="0">
-            <div class="manual-only-note">Manual entry only &mdash; how many you have uploaded?</div>
+            <div class="manual-only-note">Manual entry only &mdash; not read from Import Info</div>
           </div>
           <div class="merit-field">
             <label for="invTracker">Tracker Malware <span class="placeholder-badge" title="Only usable for Undermine">U only</span></label>
             <input type="number" id="invTracker" min="0" step="1" placeholder="0">
-            <div class="manual-only-note">Manual entry only &mdash; how many you have uploaded?</div>
+            <div class="manual-only-note">Manual entry only &mdash; not read from Import Info</div>
           </div>
         </div>
         <div class="settings-footer" style="justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
@@ -1084,9 +1083,9 @@
         </details>
 
         <details class="faq-item">
-          <summary>What's the difference between ConP and merits?</summary>
+          <summary>What's the difference between CS and merits?</summary>
           <div class="faq-body">
-            <strong>Merits</strong> are what you personally earn for a delivery. <strong>Control Points (ConP)</strong> are what actually move a system's score, and are worth a quarter of the merit value: <code>ConP per delivery = Merits &divide; 4</code>. All figures on this page are post-4&times; multiplier.
+            <strong>Merits</strong> are what you personally earn for a delivery. <strong>Control Points (CS)</strong> are what actually move a system's score, and are worth a quarter of the merit value: <code>CS per delivery = Merits &divide; 4</code>. All figures on this page are post-4&times; multiplier.
           </div>
         </details>
 
@@ -1225,7 +1224,19 @@
     var CONFIG, TIERS, DEFAULTS, SCORE_CAP;
 
     function applyConfig(cfg) {
-      CONFIG = cfg;
+      // Merge onto FALLBACK_CONFIG rather than trusting cfg outright — if the
+      // hosted config.json is older than this page (missing a field like
+      // injection/tracker/acquireMultiplier because it hasn't been redeployed
+      // yet), that field would otherwise be `undefined`, which silently poisons
+      // every downstream calculation into NaN instead of failing loudly.
+      cfg = cfg || {};
+      CONFIG = {
+        merits: Object.assign({}, FALLBACK_CONFIG.merits, cfg.merits || {}),
+        tiers:  Object.assign({}, FALLBACK_CONFIG.tiers,  cfg.tiers  || {}),
+        acquireMultiplier:   cfg.acquireMultiplier   !== undefined ? cfg.acquireMultiplier   : FALLBACK_CONFIG.acquireMultiplier,
+        reinforceMultiplier: cfg.reinforceMultiplier !== undefined ? cfg.reinforceMultiplier : FALLBACK_CONFIG.reinforceMultiplier,
+        undermineMultiplier: cfg.undermineMultiplier !== undefined ? cfg.undermineMultiplier : FALLBACK_CONFIG.undermineMultiplier,
+      };
       TIERS = {
         exploited:  { max: CONFIG.tiers.exploited,  label: 'Exploited',  badge: 'badge-exploited'  },
         fortified:  { max: CONFIG.tiers.fortified,  label: 'Fortified',  badge: 'badge-fortified'  },
@@ -1386,7 +1397,7 @@
 
       // Only categories usable for the active mode count toward totals —
       // items you have that can't be used for this activity are still shown
-      // in your inventory, but don't contribute merits/ConP here.
+      // in your inventory, but don't contribute merits/CS here.
       var totalMerits = Math.round(
         (elig.classified  ? inv.classified  * eff.classified  : 0) +
         (elig.association ? inv.association * eff.association : 0) +
@@ -1403,10 +1414,10 @@
                   : activeMode === 'undermine' ? ' <span style="color:#44dd44">(&#x00D7;' + CONFIG.undermineMultiplier + ')</span>'
                   : '';
 
-      document.getElementById('labelClassified').innerHTML  = m.classified  + ' merits' + modeTag + ' &middot; ' + fmtCP(m.classified,  mult) + ' ConP each';
-      document.getElementById('labelAssociation').innerHTML = m.association + ' merits' + modeTag + ' &middot; ' + fmtCP(m.association, mult) + ' ConP each';
-      document.getElementById('labelResearch').innerHTML    = elig.research  ? (m.research + ' merits' + modeTag + ' &middot; ' + fmtCP(m.research, mult) + ' ConP each') : ('Not usable for ' + modeLabel());
-      document.getElementById('labelCommodity').innerHTML   = elig.commodity ? (m.commodity + ' merits' + modeTag + ' &middot; ' + fmtCP(m.commodity, mult) + ' ConP each') : ('Not usable for ' + modeLabel());
+      document.getElementById('labelClassified').innerHTML  = m.classified  + ' merits' + modeTag + ' &middot; ' + fmtCP(m.classified,  mult) + ' CS each';
+      document.getElementById('labelAssociation').innerHTML = m.association + ' merits' + modeTag + ' &middot; ' + fmtCP(m.association, mult) + ' CS each';
+      document.getElementById('labelResearch').innerHTML    = elig.research  ? (m.research + ' merits' + modeTag + ' &middot; ' + fmtCP(m.research, mult) + ' CS each') : ('Not usable for ' + modeLabel());
+      document.getElementById('labelCommodity').innerHTML   = elig.commodity ? (m.commodity + ' merits' + modeTag + ' &middot; ' + fmtCP(m.commodity, mult) + ' CS each') : ('Not usable for ' + modeLabel());
 
       // Malware card — which type applies depends entirely on the active mode
       var malwareMode = activeMode === 'acquire' ? 'injection' : (activeMode === 'undermine' ? 'tracker' : null);
@@ -1414,7 +1425,7 @@
       cardMalware.classList.toggle('ineligible', !malwareMode);
       if (malwareMode) {
         document.getElementById('labelMalwareType').textContent = malwareMode === 'injection' ? 'Injection Malware' : 'Tracker Malware';
-        document.getElementById('labelMalware').innerHTML = m[malwareMode] + ' merits' + modeTag + ' &middot; ' + fmtCP(m[malwareMode], mult) + ' ConP each';
+        document.getElementById('labelMalware').innerHTML = m[malwareMode] + ' merits' + modeTag + ' &middot; ' + fmtCP(m[malwareMode], mult) + ' CS each';
       } else {
         document.getElementById('labelMalwareType').textContent = 'Malware';
         document.getElementById('labelMalware').innerHTML = 'Not usable for ' + modeLabel();
@@ -1440,19 +1451,20 @@
                      (elig.commodity    ? inv.commodity    * eff.commodity    / 4 : 0) +
                      (elig.injection    ? inv.injection    * eff.injection    / 4 : 0) +
                      (elig.tracker      ? inv.tracker      * eff.tracker      / 4 : 0);
+      if (isNaN(invScore)) invScore = 0; // safety net — should be unreachable now that applyConfig() always fills in every field
 
       var remainingScore = Math.max(0, score - invScore);
 
-      var overallText = 'Total System Target: <strong>' + Math.round(score).toLocaleString('en-GB') + '</strong> ConP<br>';
+      var overallText = 'Total System Target: <strong>' + Math.round(score).toLocaleString('en-GB') + '</strong> CS<br>';
       if (invScore > 0) {
         var progressPct = Math.min(100, (invScore / score) * 100);
         var invMerits = Math.round(invScore * 4);
-        overallText += 'Inventory covers: <strong style="color: var(--accent-color);">' + Math.round(invScore).toLocaleString('en-GB') + '</strong> ConP ' +
+        overallText += 'Inventory covers: <strong style="color: var(--accent-color);">' + Math.round(invScore).toLocaleString('en-GB') + '</strong> CS ' +
           '<span style="color: var(--muted-color);">(' + invMerits.toLocaleString('en-GB') + ' merits &middot; ' + progressPct.toFixed(1) + '% of goal)</span><br>';
         overallText += '<div style="height:6px;border-radius:3px;background:var(--input-bg);overflow:hidden;margin:4px 0 8px;">' +
           '<div style="height:100%;width:' + progressPct.toFixed(1) + '%;background:var(--accent-color);"></div></div>';
       }
-      overallText += 'Remaining Goal: <strong>' + Math.round(remainingScore).toLocaleString('en-GB') + '</strong> ConP';
+      overallText += 'Remaining Goal: <strong>' + Math.round(remainingScore).toLocaleString('en-GB') + '</strong> CS';
 
       var hasIneligibleStock = (!elig.research && inv.research > 0) || (!elig.commodity && inv.commodity > 0) ||
         (!elig.injection && inv.injection > 0) || (!elig.tracker && inv.tracker > 0);
@@ -1465,7 +1477,7 @@
       var perCmdrRemaining = remainingScore / numCmdrs;
 
       if (numCmdrs > 1) {
-        overallText += '<br>Goal per CMDR: <strong style="color: var(--accent-color);">' + Math.round(perCmdrRemaining).toLocaleString('en-GB') + '</strong> ConP';
+        overallText += '<br>Goal per CMDR: <strong style="color: var(--accent-color);">' + Math.round(perCmdrRemaining).toLocaleString('en-GB') + '</strong> CS';
       }
 
       var readoutEl = document.getElementById('remainingReadout');
@@ -1510,7 +1522,7 @@
 
       // Current inventory breakdown (only non-zero rows shown) — shared by both copy modes.
       // Ineligible-for-this-mode rows are still listed (so nothing looks like it vanished)
-      // but flagged and excluded from the merit/ConP totals.
+      // but flagged and excluded from the merit/CS totals.
       var invRows = [
         { icon: '📁', label: 'Classified Data',   count: parseInt(document.getElementById('invClassified').value, 10)  || 0, merits: eff.classified,  eligible: elig.classified },
         { icon: '🤝', label: 'Association Data',   count: parseInt(document.getElementById('invAssociation').value, 10) || 0, merits: eff.association, eligible: elig.association },
@@ -1527,14 +1539,14 @@
       var taskText = titleLine + "\n";
 
       taskText += "\n📊 **Score Breakdown**\n" +
-        "Total Target: " + Math.round(score).toLocaleString('en-GB') + " ConP\n";
+        "Total Target: " + Math.round(score).toLocaleString('en-GB') + " CS\n";
 
       if (invScore > 0) {
         var discordPct = Math.min(100, (invScore / score) * 100);
-        taskText += "Inventory Coverage: " + Math.round(invScore).toLocaleString('en-GB') + " ConP (" + invTotalMerits.toLocaleString('en-GB') + " merits)\n" +
+        taskText += "Inventory Coverage: " + Math.round(invScore).toLocaleString('en-GB') + " CS (" + invTotalMerits.toLocaleString('en-GB') + " merits)\n" +
           textProgressBar(discordPct) + " " + discordPct.toFixed(1) + "%\n";
       }
-      taskText += "Remaining Goal: " + Math.round(remainingScore).toLocaleString('en-GB') + " ConP\n";
+      taskText += "Remaining Goal: " + Math.round(remainingScore).toLocaleString('en-GB') + " CS\n";
 
       if (invRows.length > 0) {
         taskText += "\n🎒 **Your Current Inventory**\n";
@@ -1542,13 +1554,13 @@
           var cp = Math.round(r.count * r.merits / 4);
           var merits = Math.round(r.count * r.merits);
           var note = r.eligible ? '' : ' (not usable for ' + modeLabel() + ')';
-          taskText += "• " + r.icon + " " + r.label + ": " + r.count.toLocaleString('en-GB') + " (" + merits.toLocaleString('en-GB') + " merits, " + cp.toLocaleString('en-GB') + " ConP)" + note + "\n";
+          taskText += "• " + r.icon + " " + r.label + ": " + r.count.toLocaleString('en-GB') + " (" + merits.toLocaleString('en-GB') + " merits, " + cp.toLocaleString('en-GB') + " CS)" + note + "\n";
         });
       }
 
       if (numCmdrs > 1) {
         taskText += "\n👥 **Split between " + numCmdrs + " CMDRs**\n" +
-          "Goal per CMDR: " + Math.round(perCmdrRemaining).toLocaleString('en-GB') + " ConP\n";
+          "Goal per CMDR: " + Math.round(perCmdrRemaining).toLocaleString('en-GB') + " CS\n";
       }
 
       var reqHeader = numCmdrs > 1 ? "Requirements per CMDR" : "Requirements";
@@ -1564,12 +1576,12 @@
       // ── Inventory-only text ──
       var invText = titleLine + "\n";
       if (invScore > 0) {
-        invText += "Inventory Coverage: " + Math.round(invScore).toLocaleString('en-GB') + " ConP (" + invTotalMerits.toLocaleString('en-GB') + " merits)\n";
+        invText += "Inventory Coverage: " + Math.round(invScore).toLocaleString('en-GB') + " CS (" + invTotalMerits.toLocaleString('en-GB') + " merits)\n";
       }
       if (numCmdrs > 1) {
-        invText += "Goal per CMDR: " + Math.round(perCmdrRemaining).toLocaleString('en-GB') + " ConP\n";
+        invText += "Goal per CMDR: " + Math.round(perCmdrRemaining).toLocaleString('en-GB') + " CS\n";
       } else {
-        invText += "Remaining Goal: " + Math.round(remainingScore).toLocaleString('en-GB') + " ConP\n";
+        invText += "Remaining Goal: " + Math.round(remainingScore).toLocaleString('en-GB') + " CS\n";
       }
 
       if (invRows.length > 0) {
@@ -1583,7 +1595,7 @@
           var note = r.eligible ? '' : '  [not usable for ' + modeLabel() + ']';
           invText += (r.label + ':').padEnd(labelWidth + 1) + ' ' +
             r.count.toLocaleString('en-GB').padStart(countWidth) +
-            '  (' + merits.toLocaleString('en-GB') + ' merits, ' + cp.toLocaleString('en-GB') + ' ConP)' + note + '\n';
+            '  (' + merits.toLocaleString('en-GB') + ' merits, ' + cp.toLocaleString('en-GB') + ' CS)' + note + '\n';
         });
         invText += "```";
       } else {
@@ -1636,10 +1648,29 @@
       stateSelectLabel.textContent = showFrom ? 'Target State' : 'System State';
     }
 
+    // Tiers are cumulative — Fortified's own progress only starts counting
+    // after Exploited's full 350,000 is banked, and Stronghold's after
+    // Fortified's cumulative 650,000. So "Fortified 10%" is NOT 10% of
+    // 650,000 in isolation — it's 350,000 (Exploited done) + 10% of the
+    // 300,000-wide Fortified band on top of that.
+    var TIER_ORDER = ['exploited', 'fortified', 'stronghold'];
+
+    function tierBand(tierKey) {
+      var idx = TIER_ORDER.indexOf(tierKey);
+      var start = idx > 0 ? TIERS[TIER_ORDER[idx - 1]].max : 0;
+      var end = TIERS[tierKey].max;
+      return { start: start, end: end, width: end - start };
+    }
+
     function scoreForState(tier, pct) {
       var t = TIERS[tier];
-      pct = Math.min(100, Math.max(0, pct));
-      return { score: Math.round((pct / 100) * t.max), pct: pct, tier: t };
+      var band = tierBand(tier);
+      // Negative % is allowed — it represents dipping below this tier's own
+      // floor (e.g. "Fortified -10%" lands inside Exploited's range), useful
+      // when undermining a system back down past where its current tier starts.
+      pct = Math.min(100, Math.max(-100, pct));
+      var score = Math.round(band.start + (pct / 100) * band.width);
+      return { score: score, pct: pct, tier: t, band: band };
     }
 
     function applyState() {
@@ -1671,7 +1702,7 @@
           '<span class="tier-badge ' + from.tier.badge + '">' + from.tier.label + '</span>' + from.pct.toFixed(1) + '% (' + from.score.toLocaleString('en-GB') + ')' +
           ' &rarr; ' +
           '<span class="tier-badge ' + to.tier.badge + '">' + to.tier.label + '</span>' + to.pct.toFixed(1) + '% (' + to.score.toLocaleString('en-GB') + ')' +
-          ' = <strong>' + goalScore.toLocaleString('en-GB') + '</strong> ConP needed for ' + modeLabel();
+          ' = <strong>' + goalScore.toLocaleString('en-GB') + '</strong> CS needed for ' + modeLabel();
       } else {
         goalScore = to.score;
         document.getElementById('controlScore').value = Math.min(goalScore, SCORE_CAP).toLocaleString('en-GB');
