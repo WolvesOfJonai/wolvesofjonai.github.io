@@ -6,7 +6,7 @@
     "classified": 486,
     "association": 324,
     "research": 324,
-    "commodity": 85
+    "commodity": 82
   },
 
   "tiers": {
@@ -15,6 +15,8 @@
     "stronghold": 1000000
   },
 
-  "reinforceMultiplier": 0.85,
+  "_acquireNote": "Acquire is known to have SOME bonus multiplier but the exact value hasn't been confirmed yet — acquireMultiplier below is a 1.0 (no bonus) placeholder until it's known.",
+  "acquireMultiplier": 1.0,
+  "reinforceMultiplier": 0.65,
   "undermineMultiplier": 1.15
 }

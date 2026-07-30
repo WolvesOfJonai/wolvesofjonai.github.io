@@ -35,7 +35,7 @@
       border: 1px solid var(--accent-color);
       border-radius: 8px;
       padding: 24px;
-      max-width: 520px;
+      max-width: 640px;
       width: 100%;
       box-shadow: 0 4px 12px rgba(255, 140, 0, 0.15);
     }
@@ -529,7 +529,7 @@
 
     .results-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(115px, 1fr));
       gap: 8px;
     }
 
@@ -541,7 +541,8 @@
       background-color: var(--input-bg);
       border: 1px solid var(--border-color);
       border-radius: 6px;
-      padding: 10px 4px;
+      padding: 10px 6px;
+      min-width: 0;
     }
 
     .result-label {
@@ -562,6 +563,9 @@
       color: var(--accent-color);
       font-size: 0.9rem;
       margin-top: auto;
+      white-space: normal;
+      overflow-wrap: break-word;
+      max-width: 100%;
     }
 
     .result-value-sub {
@@ -603,23 +607,6 @@
       margin: 0;
     }
 
-    .result-label {
-      font-size: 0.9rem;
-    }
-
-    .result-merits {
-      font-size: 0.75rem;
-      color: var(--muted-color);
-      margin-top: 2px;
-    }
-
-    .result-value {
-      font-weight: bold;
-      color: var(--accent-color);
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-
     /* ── Controls Row (Merit values toggle + Modes) ── */
     .controls-row {
       display: flex;
@@ -648,6 +635,13 @@
       border-color: #555;
     }
 
+    /* Acquire = accent blue (the baseline/neutral activity) */
+    #btnAcquire.active {
+      border-color: var(--accent-color);
+      color: var(--accent-color);
+      background: rgba(62, 127, 193, 0.1);
+    }
+
     /* Reinforce = green */
     #btnReinforce.active {
       border-color: #2a9d2a;
@@ -660,6 +654,36 @@
       border-color: #cc3030;
       color: #ff5555;
       background: rgba(204, 48, 48, 0.1);
+    }
+
+    .result-item.ineligible {
+      opacity: 0.5;
+    }
+
+    .result-item.ineligible .result-value {
+      color: var(--muted-color);
+      font-size: 0.72rem;
+    }
+
+    .placeholder-badge {
+      display: inline-block;
+      margin-left: 5px;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 0.6rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      background: rgba(255, 180, 50, 0.15);
+      color: #ffb432;
+      border: 1px solid rgba(255, 180, 50, 0.3);
+    }
+
+    .manual-only-note {
+      font-size: 0.62rem;
+      color: var(--muted-color);
+      margin-top: 3px;
+      font-style: italic;
     }
 
     .mode-badge {
@@ -713,7 +737,7 @@
       margin-bottom: 4px;
     }
 
-    select#stateSelect {
+    select#stateSelect, select#fromStateSelect {
       width: 100%;
       padding: 10px;
       background-color: var(--input-bg);
@@ -731,7 +755,7 @@
       background-position: right 10px center;
     }
 
-    select#stateSelect:focus {
+    select#stateSelect:focus, select#fromStateSelect:focus {
       outline: none;
       border-color: var(--accent-color);
     }
@@ -752,6 +776,22 @@
       color: var(--muted-color);
       font-size: 0.9rem;
       pointer-events: none;
+    }
+
+    .state-box {
+      background-color: var(--settings-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+
+    .state-arrow-divider {
+      text-align: center;
+      font-size: 0.72rem;
+      color: var(--muted-color);
+      margin: -6px 0 14px;
+      letter-spacing: 0.02em;
     }
 
     .state-readout {
@@ -791,20 +831,18 @@
 
   <div class="container">
     <div class="top-actions-row" style="display: flex; gap: 6px; justify-content: center; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 8px; padding-bottom: 2px;">
+      <button class="reset-btn" id="btnClearForm" style="flex-shrink: 0; white-space: nowrap;" title="Clear Form Data">&#10005; Clear</button>
       <button class="reset-btn" id="guideToggle" style="flex-shrink: 0; white-space: nowrap;" title="How to Use This Site">&#128218; Guide</button>
       <button class="reset-btn" id="infoToggle" style="flex-shrink: 0; white-space: nowrap;" title="Information &amp; Tips">&#9432; Info</button>
-      <button class="reset-btn" id="btnClearForm" style="flex-shrink: 0; white-space: nowrap;" title="Clear Form Data">&#10005; Clear</button>
-    </div>
-    <div>
-      <div class="top-actions-row" style="display: flex; gap: 6px; justify-content: center; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 8px; padding-bottom: 2px;">
-      <span class="btn-row-label">(Hover over the buttons to find out more info)</span>
     </div>
 
     <div class="top-actions-row" style="display: flex; align-items: center; gap: 6px; justify-content: center; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 16px; padding-bottom: 2px;">
-      <button class="reset-btn btn-share" id="btnCopyShareLink" style="flex-shrink: 0; white-space: nowrap;" title="Copy a link that pre-fills this page with your current inputs">&#128279; Share</button>
+      <span class="btn-row-label">Share:</span>
+      <button class="reset-btn btn-share" id="btnCopyShareLink" style="flex-shrink: 0; white-space: nowrap;" title="Copy a link that pre-fills this page with your current inputs">&#128279; Link</button>
       <button class="reset-btn btn-discord" id="btnCopyInventory" style="flex-shrink: 0; white-space: nowrap;" title="Copy just your current inventory to Discord" disabled>&#127890; Inv</button>
       <button class="reset-btn btn-discord" id="btnCopyDiscord" style="flex-shrink: 0; white-space: nowrap;" title="Copy the full task breakdown to Discord" disabled>&#128203; Task</button>
     </div>
+
     <h1>Data Calculator</h1>
 
     <!-- System Name and Control Score -->
@@ -825,38 +863,71 @@
     <!-- OR: calculate from system state -->
     <div class="or-divider">or calculate from system state</div>
 
-    <div class="state-section">
-      <div class="state-row">
-        <div class="state-select-wrap">
-          <label for="stateSelect">System State</label>
-          <select id="stateSelect">
-            <option value="">— Select state —</option>
-            <option value="exploited">Exploited</option>
-            <option value="fortified">Fortified</option>
-            <option value="stronghold">Stronghold</option>
-          </select>
-        </div>
-        <div class="state-pct-wrap">
-          <label for="statePct">Progress</label>
-          <div class="pct-wrap-inner">
-            <input type="number" id="statePct" min="0" max="100" step="1" placeholder="0">
-            <span class="pct-symbol">%</span>
+    <div class="state-box" id="fromStateRow" style="display: none;">
+      <div class="state-section">
+        <div class="state-row">
+          <div class="state-select-wrap">
+            <label for="fromStateSelect">Current State</label>
+            <select id="fromStateSelect">
+              <option value="">— Select state —</option>
+              <option value="exploited">Exploited</option>
+              <option value="fortified">Fortified</option>
+              <option value="stronghold">Stronghold</option>
+            </select>
+          </div>
+          <div class="state-pct-wrap">
+            <label for="fromStatePct">Progress</label>
+            <div class="pct-wrap-inner">
+              <input type="number" id="fromStatePct" min="0" max="100" step="1" placeholder="0">
+              <span class="pct-symbol">%</span>
+            </div>
           </div>
         </div>
       </div>
-      <div class="state-readout" id="stateReadout"></div>
+    </div>
+
+    <div class="state-arrow-divider" id="stateArrowDivider" style="display: none;">&#8595; where you want it to end up &#8595;</div>
+
+    <div class="state-box">
+      <div class="state-section">
+        <div class="state-row">
+          <div class="state-select-wrap">
+            <label for="stateSelect" id="stateSelectLabel">System State</label>
+            <select id="stateSelect">
+              <option value="">— Select state —</option>
+              <option value="exploited">Exploited</option>
+              <option value="fortified">Fortified</option>
+              <option value="stronghold">Stronghold</option>
+            </select>
+          </div>
+          <div class="state-pct-wrap">
+            <label for="statePct">Progress</label>
+            <div class="pct-wrap-inner">
+              <input type="number" id="statePct" min="0" max="100" step="1" placeholder="0">
+              <span class="pct-symbol">%</span>
+            </div>
+          </div>
+        </div>
+        <div class="state-readout" id="stateReadout"></div>
+      </div>
     </div>
 
     <!-- Controls: Merit settings toggle + Modes -->
-    <div class="controls-row">
+    <div class="controls-row" style="margin-bottom: 10px;">
       <button class="settings-toggle" id="settingsToggle" aria-expanded="false" aria-controls="settingsPanel">
         &#9881; Merit Values
         <em class="chevron">&#9650;</em>
       </button>
-      <button class="mode-btn" id="btnReinforce" aria-pressed="false">
+    </div>
+
+    <div class="controls-row">
+      <button class="mode-btn" id="btnAcquire" aria-pressed="true" title="Growing control in a new/contested system — modifier not yet confirmed">
+        &#9873; Acquire <span class="mode-badge" id="acquireBadge"></span>
+      </button>
+      <button class="mode-btn" id="btnReinforce" aria-pressed="false" title="Strengthening a system you already control">
         &#8593; Reinforce <span class="mode-badge" id="reinforceBadge"></span>
       </button>
-      <button class="mode-btn" id="btnUndermine" aria-pressed="false">
+      <button class="mode-btn" id="btnUndermine" aria-pressed="false" title="Reducing an opponent's system control">
         &#8595; Undermine <span class="mode-badge" id="undermineBadge"></span>
       </button>
     </div>
@@ -879,6 +950,14 @@
           <div class="merit-field">
             <label for="meritCommodity">Power Commodities (merits)</label>
             <input type="number" id="meritCommodity" min="1" step="1">
+          </div>
+          <div class="merit-field">
+            <label for="meritInjection">Injection Malware (merits) <span class="placeholder-badge" title="Value not yet confirmed">Unverified</span></label>
+            <input type="number" id="meritInjection" min="1" step="1">
+          </div>
+          <div class="merit-field">
+            <label for="meritTracker">Tracker Malware (merits) <span class="placeholder-badge" title="Value not yet confirmed">Unverified</span></label>
+            <input type="number" id="meritTracker" min="1" step="1">
           </div>
         </div>
         <div class="settings-footer">
@@ -916,6 +995,16 @@
             <label for="invCommodity">Power Goods from boxes</label>
             <input type="number" id="invCommodity" min="0" step="1" placeholder="0">
           </div>
+          <div class="merit-field">
+            <label for="invInjection">Injection Malware <span class="placeholder-badge" title="Only usable for Acquire">A only</span></label>
+            <input type="number" id="invInjection" min="0" step="1" placeholder="0">
+            <div class="manual-only-note">Manual entry only &mdash; not read from Import Info</div>
+          </div>
+          <div class="merit-field">
+            <label for="invTracker">Tracker Malware <span class="placeholder-badge" title="Only usable for Undermine">U only</span></label>
+            <input type="number" id="invTracker" min="0" step="1" placeholder="0">
+            <div class="manual-only-note">Manual entry only &mdash; not read from Import Info</div>
+          </div>
         </div>
         <div class="settings-footer" style="justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
           <div style="font-size: 0.85rem; color: var(--muted-color);">Total Items: <strong id="invTotalCount" style="color: var(--text-color);">0</strong> <span id="invTotalMerits"></span></div>
@@ -941,29 +1030,35 @@
       <div id="remainingReadout" style="font-size: 0.85rem; color: var(--text-color); margin-bottom: 12px; display: none; line-height: 1.5;">
       </div>
       <div class="results-grid">
-        <div class="result-item">
+        <div class="result-item" id="cardClassified">
           <div class="result-label">Classified Data</div>
           <div class="result-merits" id="labelClassified"></div>
           <span class="result-value" id="resClassified">—</span>
           <div class="result-value-sub" id="resClassifiedMerits"></div>
         </div>
-        <div class="result-item">
+        <div class="result-item" id="cardAssociation">
           <div class="result-label">Association / Political Data</div>
           <div class="result-merits" id="labelAssociation"></div>
           <span class="result-value" id="resAssociation">—</span>
           <div class="result-value-sub" id="resAssociationMerits"></div>
         </div>
-        <div class="result-item">
+        <div class="result-item" id="cardResearch">
           <div class="result-label">Research / Industrial Data</div>
           <div class="result-merits" id="labelResearch"></div>
           <span class="result-value" id="resResearch">—</span>
           <div class="result-value-sub" id="resResearchMerits"></div>
         </div>
-        <div class="result-item">
+        <div class="result-item" id="cardCommodity">
           <div class="result-label">Power Commodities</div>
           <div class="result-merits" id="labelCommodity"></div>
           <span class="result-value" id="resCommodity">—</span>
           <div class="result-value-sub" id="resCommodityMerits"></div>
+        </div>
+        <div class="result-item" id="cardMalware">
+          <div class="result-label" id="labelMalwareType">Malware</div>
+          <div class="result-merits" id="labelMalware"></div>
+          <span class="result-value" id="resMalware">—</span>
+          <div class="result-value-sub" id="resMalwareMerits"></div>
         </div>
       </div>
     </div>
@@ -1109,13 +1204,16 @@
         association: 324,   // Power Association / Political Data
         research:    324,   // Power Research / Industrial Data
         commodity:    85,   // Powerplay Goods / Commodities
+        injection:   100,   // Injection Malware — UNVERIFIED placeholder, confirm real value
+        tracker:     100,   // Tracker Malware — UNVERIFIED placeholder, confirm real value
       },
       tiers: {
         exploited:  350000,
         fortified:  650000,
         stronghold: 1000000,
       },
-      reinforceMultiplier: 0.85,   // -15%
+      acquireMultiplier:    1.0,   // UNVERIFIED — Acquire is known to have some bonus, exact value TBD
+      reinforceMultiplier: 0.65,   // -35%
       undermineMultiplier: 1.15,   // +15%
     };
     /* ============================================================ */
@@ -1134,7 +1232,24 @@
       SCORE_CAP = CONFIG.tiers.stronghold * 4; // hard ceiling — 4x Stronghold max
     }
 
-    var activeMode  = null; // null | 'reinforce' | 'undermine'
+    // Which activities each category can actually be used for. Per CMDR-confirmed
+    // mechanics: Research/Industrial Data and all Power Goods don't count toward
+    // Reinforcement at all; Injection Malware only counts for Acquisition, Tracker
+    // Malware only counts for Undermining.
+    var ELIGIBILITY = {
+      classified:  ['acquire', 'reinforce', 'undermine'],
+      association: ['acquire', 'reinforce', 'undermine'],
+      research:    ['acquire', 'undermine'],
+      commodity:   ['acquire', 'undermine'],
+      injection:   ['acquire'],
+      tracker:     ['undermine'],
+    };
+
+    function isEligible(categoryKey, mode) {
+      return ELIGIBILITY[categoryKey].indexOf(mode) !== -1;
+    }
+
+    var activeMode = 'acquire'; // 'acquire' | 'reinforce' | 'undermine' — always exactly one
 
     var itemsNeeded = function(score, merits) {
       return Math.ceil(score / (merits / 4));
@@ -1143,7 +1258,13 @@
     function getMultiplier() {
       if (activeMode === 'reinforce') return CONFIG.reinforceMultiplier;
       if (activeMode === 'undermine') return CONFIG.undermineMultiplier;
-      return 1;
+      return CONFIG.acquireMultiplier || 1; // unverified — see config.json; falls back to 1 if an older config.json lacks this field
+    }
+
+    function modeLabel() {
+      if (activeMode === 'reinforce') return 'Reinforce';
+      if (activeMode === 'undermine') return 'Undermine';
+      return 'Acquire';
     }
 
     function getMerits() {
@@ -1152,6 +1273,8 @@
         association: Math.max(1, parseInt(document.getElementById('meritAssociation').value, 10) || DEFAULTS.association),
         research:    Math.max(1, parseInt(document.getElementById('meritResearch').value,    10) || DEFAULTS.research),
         commodity:   Math.max(1, parseInt(document.getElementById('meritCommodity').value,   10) || DEFAULTS.commodity),
+        injection:   Math.max(1, parseInt(document.getElementById('meritInjection').value,    10) || DEFAULTS.injection),
+        tracker:     Math.max(1, parseInt(document.getElementById('meritTracker').value,      10) || DEFAULTS.tracker),
       };
     }
 
@@ -1170,6 +1293,8 @@
         association: assoc,
         research:    res,
         commodity:   parseInt(document.getElementById('invCommodity').value,   10) || 0,
+        injection:   parseInt(document.getElementById('invInjection').value,   10) || 0,
+        tracker:     parseInt(document.getElementById('invTracker').value,     10) || 0,
       };
     }
 
@@ -1181,12 +1306,16 @@
         controlScore: document.getElementById('controlScore').value,
         stateSelect: document.getElementById('stateSelect').value,
         statePct: document.getElementById('statePct').value,
+        fromStateSelect: document.getElementById('fromStateSelect').value,
+        fromStatePct: document.getElementById('fromStatePct').value,
         numCmdrs: document.getElementById('numCmdrs').value,
         activeMode: activeMode,
         meritClassified: document.getElementById('meritClassified').value,
         meritAssociation: document.getElementById('meritAssociation').value,
         meritResearch: document.getElementById('meritResearch').value,
         meritCommodity: document.getElementById('meritCommodity').value,
+        meritInjection: document.getElementById('meritInjection').value,
+        meritTracker: document.getElementById('meritTracker').value,
       };
       localStorage.setItem('ppOptions', JSON.stringify(opts));
     }
@@ -1227,7 +1356,7 @@
       var m     = getMerits();
       var mult  = getMultiplier();
       var inv   = getInventory();
-      var totalItems = inv.classified + inv.association + inv.research + inv.commodity;
+      var totalItems = inv.classified + inv.association + inv.research + inv.commodity + inv.injection + inv.tracker;
 
       // Effective merits after mode multiplier
       var eff = {
@@ -1235,16 +1364,36 @@
         association: m.association * mult,
         research:    m.research    * mult,
         commodity:   m.commodity   * mult,
+        injection:   m.injection   * mult,
+        tracker:     m.tracker     * mult,
       };
 
+      // Eligibility for the currently-active activity
+      var elig = {
+        classified:  isEligible('classified',  activeMode),
+        association: isEligible('association', activeMode),
+        research:    isEligible('research',    activeMode),
+        commodity:   isEligible('commodity',   activeMode),
+        injection:   isEligible('injection',   activeMode),
+        tracker:     isEligible('tracker',     activeMode),
+      };
+
+      document.getElementById('cardResearch').classList.toggle('ineligible', !elig.research);
+      document.getElementById('cardCommodity').classList.toggle('ineligible', !elig.commodity);
+
+      // Only categories usable for the active mode count toward totals —
+      // items you have that can't be used for this activity are still shown
+      // in your inventory, but don't contribute merits/ConP here.
       var totalMerits = Math.round(
-        inv.classified  * eff.classified +
-        inv.association * eff.association +
-        inv.research    * eff.research +
-        inv.commodity    * eff.commodity
+        (elig.classified  ? inv.classified  * eff.classified  : 0) +
+        (elig.association ? inv.association * eff.association : 0) +
+        (elig.research    ? inv.research    * eff.research    : 0) +
+        (elig.commodity    ? inv.commodity    * eff.commodity    : 0) +
+        (elig.injection    ? inv.injection    * eff.injection    : 0) +
+        (elig.tracker      ? inv.tracker      * eff.tracker      : 0)
       );
       document.getElementById('invTotalCount').textContent = totalItems.toLocaleString('en-GB');
-      document.getElementById('invTotalMerits').textContent = totalItems > 0 ? '(' + totalMerits.toLocaleString('en-GB') + ' merits)' : '';
+      document.getElementById('invTotalMerits').textContent = totalItems > 0 ? '(' + totalMerits.toLocaleString('en-GB') + ' merits usable for ' + modeLabel() + ')' : '';
 
       // Sub-labels: show base merits and effective CP
       var modeTag = activeMode === 'reinforce' ? ' <span style="color:#ff5555">(&#x00D7;' + CONFIG.reinforceMultiplier + ')</span>'
@@ -1253,14 +1402,26 @@
 
       document.getElementById('labelClassified').innerHTML  = m.classified  + ' merits' + modeTag + ' &middot; ' + fmtCP(m.classified,  mult) + ' ConP each';
       document.getElementById('labelAssociation').innerHTML = m.association + ' merits' + modeTag + ' &middot; ' + fmtCP(m.association, mult) + ' ConP each';
-      document.getElementById('labelResearch').innerHTML    = m.research    + ' merits' + modeTag + ' &middot; ' + fmtCP(m.research,    mult) + ' ConP each';
-      document.getElementById('labelCommodity').innerHTML   = m.commodity   + ' merits' + modeTag + ' &middot; ' + fmtCP(m.commodity,   mult) + ' ConP each';
+      document.getElementById('labelResearch').innerHTML    = elig.research  ? (m.research + ' merits' + modeTag + ' &middot; ' + fmtCP(m.research, mult) + ' ConP each') : ('Not usable for ' + modeLabel());
+      document.getElementById('labelCommodity').innerHTML   = elig.commodity ? (m.commodity + ' merits' + modeTag + ' &middot; ' + fmtCP(m.commodity, mult) + ' ConP each') : ('Not usable for ' + modeLabel());
+
+      // Malware card — which type applies depends entirely on the active mode
+      var malwareMode = activeMode === 'acquire' ? 'injection' : (activeMode === 'undermine' ? 'tracker' : null);
+      var cardMalware = document.getElementById('cardMalware');
+      cardMalware.classList.toggle('ineligible', !malwareMode);
+      if (malwareMode) {
+        document.getElementById('labelMalwareType').textContent = malwareMode === 'injection' ? 'Injection Malware' : 'Tracker Malware';
+        document.getElementById('labelMalware').innerHTML = m[malwareMode] + ' merits' + modeTag + ' &middot; ' + fmtCP(m[malwareMode], mult) + ' ConP each';
+      } else {
+        document.getElementById('labelMalwareType').textContent = 'Malware';
+        document.getElementById('labelMalware').innerHTML = 'Not usable for ' + modeLabel();
+      }
 
       if (score <= 0) {
-        ['resClassified','resAssociation','resResearch','resCommodity'].forEach(function(id) {
+        ['resClassified','resAssociation','resResearch','resCommodity','resMalware'].forEach(function(id) {
           document.getElementById(id).textContent = '—';
         });
-        ['resClassifiedMerits','resAssociationMerits','resResearchMerits','resCommodityMerits'].forEach(function(id) {
+        ['resClassifiedMerits','resAssociationMerits','resResearchMerits','resCommodityMerits','resMalwareMerits'].forEach(function(id) {
           document.getElementById(id).textContent = '';
         });
         document.getElementById('remainingReadout').style.display = 'none';
@@ -1269,11 +1430,13 @@
         return;
       }
 
-      // Calculate how much CP the inventory already provides
-      var invScore = (inv.classified * eff.classified / 4) +
-                     (inv.association * eff.association / 4) +
-                     (inv.research * eff.research / 4) +
-                     (inv.commodity * eff.commodity / 4);
+      // Calculate how much CP the inventory already provides (ineligible categories excluded)
+      var invScore = (elig.classified  ? inv.classified  * eff.classified  / 4 : 0) +
+                     (elig.association ? inv.association * eff.association / 4 : 0) +
+                     (elig.research    ? inv.research    * eff.research    / 4 : 0) +
+                     (elig.commodity    ? inv.commodity    * eff.commodity    / 4 : 0) +
+                     (elig.injection    ? inv.injection    * eff.injection    / 4 : 0) +
+                     (elig.tracker      ? inv.tracker      * eff.tracker      / 4 : 0);
 
       var remainingScore = Math.max(0, score - invScore);
 
@@ -1287,6 +1450,12 @@
           '<div style="height:100%;width:' + progressPct.toFixed(1) + '%;background:var(--accent-color);"></div></div>';
       }
       overallText += 'Remaining Goal: <strong>' + Math.round(remainingScore).toLocaleString('en-GB') + '</strong> ConP';
+
+      var hasIneligibleStock = (!elig.research && inv.research > 0) || (!elig.commodity && inv.commodity > 0) ||
+        (!elig.injection && inv.injection > 0) || (!elig.tracker && inv.tracker > 0);
+      if (hasIneligibleStock) {
+        overallText += '<br><span style="color:#ffb432; font-size:0.85em;">&#9888; Some inventory isn\'t usable for ' + modeLabel() + ' and is excluded above &mdash; see the greyed-out cards below.</span>';
+      }
 
       var numCmdrs = Math.max(1, parseInt(document.getElementById('numCmdrs').value, 10) || 1);
       var perCmdrText = numCmdrs > 1 ? ' (each)' : '';
@@ -1302,14 +1471,23 @@
 
       document.getElementById('resClassified').textContent  = itemsNeeded(perCmdrRemaining, eff.classified).toLocaleString()  + ' pieces' + perCmdrText;
       document.getElementById('resAssociation').textContent = itemsNeeded(perCmdrRemaining, eff.association).toLocaleString() + ' pieces' + perCmdrText;
-      document.getElementById('resResearch').textContent    = itemsNeeded(perCmdrRemaining, eff.research).toLocaleString()    + ' pieces' + perCmdrText;
-      document.getElementById('resCommodity').textContent   = itemsNeeded(perCmdrRemaining, eff.commodity).toLocaleString()   + ' units' + perCmdrText;
+      document.getElementById('resResearch').textContent    = elig.research  ? (itemsNeeded(perCmdrRemaining, eff.research).toLocaleString()  + ' pieces' + perCmdrText) : ('Not usable for ' + modeLabel());
+      document.getElementById('resCommodity').textContent   = elig.commodity ? (itemsNeeded(perCmdrRemaining, eff.commodity).toLocaleString() + ' units'  + perCmdrText) : ('Not usable for ' + modeLabel());
 
       // How many merits you'd earn if that category alone covered the (per-CMDR) goal
       document.getElementById('resClassifiedMerits').textContent  = '≈ ' + Math.round(itemsNeeded(perCmdrRemaining, eff.classified)  * eff.classified).toLocaleString('en-GB')  + ' merits';
       document.getElementById('resAssociationMerits').textContent = '≈ ' + Math.round(itemsNeeded(perCmdrRemaining, eff.association) * eff.association).toLocaleString('en-GB') + ' merits';
-      document.getElementById('resResearchMerits').textContent    = '≈ ' + Math.round(itemsNeeded(perCmdrRemaining, eff.research)    * eff.research).toLocaleString('en-GB')    + ' merits';
-      document.getElementById('resCommodityMerits').textContent   = '≈ ' + Math.round(itemsNeeded(perCmdrRemaining, eff.commodity)   * eff.commodity).toLocaleString('en-GB')   + ' merits';
+      document.getElementById('resResearchMerits').textContent    = elig.research  ? ('≈ ' + Math.round(itemsNeeded(perCmdrRemaining, eff.research)  * eff.research).toLocaleString('en-GB')  + ' merits') : '';
+      document.getElementById('resCommodityMerits').textContent   = elig.commodity ? ('≈ ' + Math.round(itemsNeeded(perCmdrRemaining, eff.commodity) * eff.commodity).toLocaleString('en-GB') + ' merits') : '';
+
+      if (malwareMode) {
+        var malwareEff = eff[malwareMode];
+        document.getElementById('resMalware').textContent = itemsNeeded(perCmdrRemaining, malwareEff).toLocaleString() + ' pieces' + perCmdrText;
+        document.getElementById('resMalwareMerits').textContent = '≈ ' + Math.round(itemsNeeded(perCmdrRemaining, malwareEff) * malwareEff).toLocaleString('en-GB') + ' merits';
+      } else {
+        document.getElementById('resMalware').textContent = 'Not usable for ' + modeLabel();
+        document.getElementById('resMalwareMerits').textContent = '';
+      }
 
       document.getElementById('btnCopyDiscord').disabled = false;
       document.getElementById('btnCopyInventory').disabled = false;
@@ -1327,16 +1505,20 @@
         return '█'.repeat(filled) + '░'.repeat(len - filled);
       }
 
-      // Current inventory breakdown (only non-zero rows shown) — shared by both copy modes
+      // Current inventory breakdown (only non-zero rows shown) — shared by both copy modes.
+      // Ineligible-for-this-mode rows are still listed (so nothing looks like it vanished)
+      // but flagged and excluded from the merit/ConP totals.
       var invRows = [
-        { icon: '📁', label: 'Classified Data',  count: parseInt(document.getElementById('invClassified').value, 10)  || 0, merits: eff.classified },
-        { icon: '🤝', label: 'Association Data',  count: parseInt(document.getElementById('invAssociation').value, 10) || 0, merits: eff.association },
-        { icon: '🗳️', label: 'Political Data',    count: parseInt(document.getElementById('invPolitical').value, 10)   || 0, merits: eff.association },
-        { icon: '🔬', label: 'Research Data',      count: parseInt(document.getElementById('invResearch').value, 10)    || 0, merits: eff.research },
-        { icon: '🏭', label: 'Industrial Data',    count: parseInt(document.getElementById('invIndustrial').value, 10)  || 0, merits: eff.research },
-        { icon: '🔋', label: 'Power Commodities',  count: parseInt(document.getElementById('invCommodity').value, 10)   || 0, merits: eff.commodity },
+        { icon: '📁', label: 'Classified Data',   count: parseInt(document.getElementById('invClassified').value, 10)  || 0, merits: eff.classified,  eligible: elig.classified },
+        { icon: '🤝', label: 'Association Data',   count: parseInt(document.getElementById('invAssociation').value, 10) || 0, merits: eff.association, eligible: elig.association },
+        { icon: '🗳️', label: 'Political Data',     count: parseInt(document.getElementById('invPolitical').value, 10)   || 0, merits: eff.association, eligible: elig.association },
+        { icon: '🔬', label: 'Research Data',       count: parseInt(document.getElementById('invResearch').value, 10)    || 0, merits: eff.research,    eligible: elig.research },
+        { icon: '🏭', label: 'Industrial Data',     count: parseInt(document.getElementById('invIndustrial').value, 10)  || 0, merits: eff.research,    eligible: elig.research },
+        { icon: '🔋', label: 'Power Commodities',   count: parseInt(document.getElementById('invCommodity').value, 10)   || 0, merits: eff.commodity,   eligible: elig.commodity },
+        { icon: '💉', label: 'Injection Malware',   count: parseInt(document.getElementById('invInjection').value, 10)   || 0, merits: eff.injection,   eligible: elig.injection },
+        { icon: '📡', label: 'Tracker Malware',     count: parseInt(document.getElementById('invTracker').value, 10)     || 0, merits: eff.tracker,     eligible: elig.tracker },
       ].filter(function(r) { return r.count > 0; });
-      var invTotalMerits = invRows.reduce(function(sum, r) { return sum + Math.round(r.count * r.merits); }, 0);
+      var invTotalMerits = invRows.reduce(function(sum, r) { return sum + (r.eligible ? Math.round(r.count * r.merits) : 0); }, 0);
 
       // ── Full task text ──
       var taskText = titleLine + "\n";
@@ -1356,7 +1538,8 @@
         invRows.forEach(function(r) {
           var cp = Math.round(r.count * r.merits / 4);
           var merits = Math.round(r.count * r.merits);
-          taskText += "• " + r.icon + " " + r.label + ": " + r.count.toLocaleString('en-GB') + " (" + merits.toLocaleString('en-GB') + " merits, " + cp.toLocaleString('en-GB') + " ConP)\n";
+          var note = r.eligible ? '' : ' (not usable for ' + modeLabel() + ')';
+          taskText += "• " + r.icon + " " + r.label + ": " + r.count.toLocaleString('en-GB') + " (" + merits.toLocaleString('en-GB') + " merits, " + cp.toLocaleString('en-GB') + " ConP)" + note + "\n";
         });
       }
 
@@ -1366,11 +1549,12 @@
       }
 
       var reqHeader = numCmdrs > 1 ? "Requirements per CMDR" : "Requirements";
-      taskText += "\n📦 **" + reqHeader + " (Mix & Match, still needed)**\n" +
+      taskText += "\n📦 **" + reqHeader + " (Mix & Match, still needed) — " + modeLabel() + "**\n" +
         "• 📁 Classified Data: " + document.getElementById('resClassified').textContent + " (" + document.getElementById('resClassifiedMerits').textContent + ")\n" +
         "• 🤝 Association / Political Data: " + document.getElementById('resAssociation').textContent + " (" + document.getElementById('resAssociationMerits').textContent + ")\n" +
-        "• 🔬 Research / Industrial Data: " + document.getElementById('resResearch').textContent + " (" + document.getElementById('resResearchMerits').textContent + ")\n" +
-        "• 🔋 Power Commodities: " + document.getElementById('resCommodity').textContent + " (" + document.getElementById('resCommodityMerits').textContent + ")\n";
+        "• 🔬 Research / Industrial Data: " + document.getElementById('resResearch').textContent + (document.getElementById('resResearchMerits').textContent ? " (" + document.getElementById('resResearchMerits').textContent + ")" : "") + "\n" +
+        "• 🔋 Power Commodities: " + document.getElementById('resCommodity').textContent + (document.getElementById('resCommodityMerits').textContent ? " (" + document.getElementById('resCommodityMerits').textContent + ")" : "") + "\n" +
+        "• 🦠 " + document.getElementById('labelMalwareType').textContent + ": " + document.getElementById('resMalware').textContent + (document.getElementById('resMalwareMerits').textContent ? " (" + document.getElementById('resMalwareMerits').textContent + ")" : "") + "\n";
 
       window.discordTaskText = taskText;
 
@@ -1393,9 +1577,10 @@
         invRows.forEach(function(r) {
           var cp = Math.round(r.count * r.merits / 4);
           var merits = Math.round(r.count * r.merits);
+          var note = r.eligible ? '' : '  [not usable for ' + modeLabel() + ']';
           invText += (r.label + ':').padEnd(labelWidth + 1) + ' ' +
             r.count.toLocaleString('en-GB').padStart(countWidth) +
-            '  (' + merits.toLocaleString('en-GB') + ' merits, ' + cp.toLocaleString('en-GB') + ' ConP)\n';
+            '  (' + merits.toLocaleString('en-GB') + ' merits, ' + cp.toLocaleString('en-GB') + ' ConP)' + note + '\n';
         });
         invText += "```";
       } else {
@@ -1424,40 +1609,94 @@
       formatScoreField(e.target);
       document.getElementById('stateSelect').value = '';
       document.getElementById('statePct').value    = '';
+      document.getElementById('fromStateSelect').value = '';
+      document.getElementById('fromStatePct').value    = '';
       document.getElementById('stateReadout').innerHTML = '';
       calculate();
     });
 
     // State helper
-    var stateSelect  = document.getElementById('stateSelect');
-    var statePct     = document.getElementById('statePct');
-    var stateReadout = document.getElementById('stateReadout');
+    var stateSelect      = document.getElementById('stateSelect');
+    var statePct         = document.getElementById('statePct');
+    var stateReadout     = document.getElementById('stateReadout');
+    var fromStateSelect  = document.getElementById('fromStateSelect');
+    var fromStatePct     = document.getElementById('fromStatePct');
+    var fromStateRow     = document.getElementById('fromStateRow');
+    var stateSelectLabel = document.getElementById('stateSelectLabel');
+
+    // The From (current) row only makes sense for Reinforce/Undermine — Acquire
+    // starts from zero, so there's nothing to subtract.
+    function updateStateRowVisibility() {
+      var showFrom = activeMode !== 'acquire';
+      fromStateRow.style.display = showFrom ? 'block' : 'none';
+      document.getElementById('stateArrowDivider').style.display = showFrom ? 'block' : 'none';
+      stateSelectLabel.textContent = showFrom ? 'Target State' : 'System State';
+    }
+
+    function scoreForState(tier, pct) {
+      var t = TIERS[tier];
+      pct = Math.min(100, Math.max(0, pct));
+      return { score: Math.round((pct / 100) * t.max), pct: pct, tier: t };
+    }
 
     function applyState() {
-      var tier = stateSelect.value;
-      var pct  = parseFloat(statePct.value);
+      var toTier = stateSelect.value;
+      var toPct  = parseFloat(statePct.value);
 
-      if (!tier || isNaN(pct)) {
+      if (!toTier || isNaN(toPct)) {
         stateReadout.innerHTML = '';
         return;
       }
 
-      pct = Math.min(100, Math.max(0, pct));
-      var t     = TIERS[tier];
-      var score = Math.round((pct / 100) * t.max);
+      var to = scoreForState(toTier, toPct);
 
-      // Fill the score field and recalculate
-      document.getElementById('controlScore').value = Math.min(score, SCORE_CAP).toLocaleString('en-GB');
-      calculate();
+      var useFrom  = activeMode !== 'acquire';
+      var fTier    = useFrom ? fromStateSelect.value : '';
+      var fPctRaw  = useFrom ? parseFloat(fromStatePct.value) : NaN;
+      var hasFrom  = useFrom && fTier && !isNaN(fPctRaw);
 
-      stateReadout.innerHTML =
-        '<span class="tier-badge ' + t.badge + '">' + t.label + '</span>' +
-        'at ' + pct.toFixed(1) + '% &rarr; score&nbsp;<strong>' + score.toLocaleString('en-GB') + '</strong>' +
-        ' (max ' + t.max.toLocaleString('en-GB') + ')';
+      var goalScore;
+
+      if (hasFrom) {
+        var from = scoreForState(fTier, fPctRaw);
+        goalScore = Math.abs(to.score - from.score);
+
+        document.getElementById('controlScore').value = Math.min(goalScore, SCORE_CAP).toLocaleString('en-GB');
+        calculate();
+
+        stateReadout.innerHTML =
+          '<span class="tier-badge ' + from.tier.badge + '">' + from.tier.label + '</span>' + from.pct.toFixed(1) + '% (' + from.score.toLocaleString('en-GB') + ')' +
+          ' &rarr; ' +
+          '<span class="tier-badge ' + to.tier.badge + '">' + to.tier.label + '</span>' + to.pct.toFixed(1) + '% (' + to.score.toLocaleString('en-GB') + ')' +
+          ' = <strong>' + goalScore.toLocaleString('en-GB') + '</strong> ConP needed for ' + modeLabel();
+      } else {
+        goalScore = to.score;
+        document.getElementById('controlScore').value = Math.min(goalScore, SCORE_CAP).toLocaleString('en-GB');
+        calculate();
+
+        var fromHint = '';
+        if (useFrom) {
+          if (fTier && isNaN(fPctRaw)) {
+            fromHint = '<br><span style="color: var(--muted-color);">Enter a Progress % for your Current State above to calculate just the gap you still need.</span>';
+          } else if (!fTier && !isNaN(fPctRaw)) {
+            fromHint = '<br><span style="color: var(--muted-color);">Pick a Current State above to calculate just the gap you still need.</span>';
+          } else if (!fTier && isNaN(fPctRaw)) {
+            fromHint = '<br><span style="color: var(--muted-color);">Add a Current State above to calculate just the gap you still need.</span>';
+          }
+        }
+
+        stateReadout.innerHTML =
+          '<span class="tier-badge ' + to.tier.badge + '">' + to.tier.label + '</span>' +
+          'at ' + to.pct.toFixed(1) + '% &rarr; score&nbsp;<strong>' + to.score.toLocaleString('en-GB') + '</strong>' +
+          ' (max ' + to.tier.max.toLocaleString('en-GB') + ')' +
+          fromHint;
+      }
     }
 
     stateSelect.addEventListener('change', applyState);
     statePct.addEventListener('input',    applyState);
+    fromStateSelect.addEventListener('change', applyState);
+    fromStatePct.addEventListener('input',    applyState);
 
     // Merit inputs
     ['meritClassified','meritAssociation','meritResearch','meritCommodity'].forEach(function(id) {
@@ -1473,11 +1712,13 @@
         research: document.getElementById('invResearch').value,
         industrial: document.getElementById('invIndustrial').value,
         commodity: document.getElementById('invCommodity').value,
+        injection: document.getElementById('invInjection').value,
+        tracker: document.getElementById('invTracker').value,
       };
       localStorage.setItem('ppInventory', JSON.stringify(inv));
     }
 
-    ['invClassified','invAssociation','invPolitical','invResearch','invIndustrial','invCommodity'].forEach(function(id) {
+    ['invClassified','invAssociation','invPolitical','invResearch','invIndustrial','invCommodity','invInjection','invTracker'].forEach(function(id) {
       document.getElementById(id).addEventListener('input', function() {
         saveInventory();
         calculate();
@@ -1485,7 +1726,7 @@
     });
 
     document.getElementById('clearInventory').addEventListener('click', function() {
-      ['invClassified','invAssociation','invPolitical','invResearch','invIndustrial','invCommodity'].forEach(function(id) {
+      ['invClassified','invAssociation','invPolitical','invResearch','invIndustrial','invCommodity','invInjection','invTracker'].forEach(function(id) {
         document.getElementById(id).value = '';
       });
       saveInventory();
@@ -1530,6 +1771,14 @@
       powerplaymilitary: 'Military Schematic',
       powerequipment:    'Personal Protective Equipment',
     };
+
+    // Malware (Injection/Tracker) is deliberately NOT in either map above and
+    // must stay that way — do not add powerinjectionmalware/powertrackermalware
+    // (or whatever the real internal names turn out to be) without explicit
+    // confirmation. As a hard backstop against that ever happening by accident,
+    // handleShipLockerFile() below refuses to write to these fields even if a
+    // future map edit somehow points at them.
+    var NEVER_AUTO_IMPORTED_FIELDS = ['invInjection', 'invTracker'];
 
     function populateGoodsList() {
       var container = document.getElementById('goodsListContainer');
@@ -1590,6 +1839,7 @@
         }
 
         Object.keys(sums).forEach(function(field) {
+          if (NEVER_AUTO_IMPORTED_FIELDS.indexOf(field) !== -1) return; // safety backstop — see note above SHIPLOCKER_ITEMS_MAP
           document.getElementById(field).value = sums[field];
         });
         saveInventory();
@@ -1649,24 +1899,18 @@
 
         document.getElementById('stateSelect').value = '';
         document.getElementById('statePct').value = '';
+        document.getElementById('fromStateSelect').value = '';
+        document.getElementById('fromStatePct').value = '';
         document.getElementById('stateReadout').innerHTML = '';
 
         document.getElementById('numCmdrs').value = '1';
 
-        activeMode = null;
-        var bReinforce = document.getElementById('btnReinforce');
-        var bUndermine = document.getElementById('btnUndermine');
-        if (bReinforce) {
-          bReinforce.classList.remove('active');
-          bReinforce.setAttribute('aria-pressed', 'false');
-        }
-        if (bUndermine) {
-          bUndermine.classList.remove('active');
-          bUndermine.setAttribute('aria-pressed', 'false');
-        }
+        activeMode = 'acquire';
+        updateModeButtons();
+        updateStateRowVisibility();
 
         // Also clear inventory
-        ['invClassified','invAssociation','invPolitical','invResearch','invIndustrial','invCommodity'].forEach(function(id) {
+        ['invClassified','invAssociation','invPolitical','invResearch','invIndustrial','invCommodity','invInjection','invTracker'].forEach(function(id) {
           var el = document.getElementById(id);
           if (el) el.value = '';
         });
@@ -1721,16 +1965,24 @@
       var sp = document.getElementById('statePct').value;
       if (sp !== '') params.set('pct', sp);
 
+      var fss = document.getElementById('fromStateSelect').value;
+      if (fss) params.set('fstate', fss);
+
+      var fsp = document.getElementById('fromStatePct').value;
+      if (fsp !== '') params.set('fpct', fsp);
+
       var nc = document.getElementById('numCmdrs').value;
       if (nc && nc !== '1') params.set('cmdrs', nc);
 
-      if (activeMode) params.set('mode', activeMode);
+      if (activeMode !== 'acquire') params.set('mode', activeMode);
 
       var m = getMerits();
       if (m.classified  !== DEFAULTS.classified)  params.set('mc',   m.classified);
       if (m.association !== DEFAULTS.association) params.set('ma',   m.association);
       if (m.research     !== DEFAULTS.research)    params.set('mr',   m.research);
       if (m.commodity     !== DEFAULTS.commodity)   params.set('mcom', m.commodity);
+      if (m.injection     !== DEFAULTS.injection)    params.set('minj', m.injection);
+      if (m.tracker       !== DEFAULTS.tracker)      params.set('mtrk', m.tracker);
 
       // Deliberately NOT included: your personal inventory counts (ic/ia/ip/ir/ii/icom).
       // A share link is meant to hand off the *goal*, not your ShipLocker contents —
@@ -1761,6 +2013,8 @@
       document.getElementById('meritAssociation').value = DEFAULTS.association;
       document.getElementById('meritResearch').value    = DEFAULTS.research;
       document.getElementById('meritCommodity').value   = DEFAULTS.commodity;
+      document.getElementById('meritInjection').value   = DEFAULTS.injection;
+      document.getElementById('meritTracker').value     = DEFAULTS.tracker;
       calculate();
     });
 
@@ -1796,20 +2050,37 @@
     setupModal('infoToggle',  'infoModalOverlay',  'infoModalClose');
     setupModal('guideToggle', 'guideModalOverlay', 'guideModalClose');
 
-    // Reinforce / Undermine buttons
+    // Acquire / Reinforce / Undermine — always exactly one active
+    var btnAcquire   = document.getElementById('btnAcquire');
     var btnReinforce = document.getElementById('btnReinforce');
     var btnUndermine = document.getElementById('btnUndermine');
 
-    function setMode(mode) {
-      // Toggle off if already active
-      activeMode = (activeMode === mode) ? null : mode;
+    function updateModeButtons() {
+      btnAcquire.classList.toggle('active', activeMode === 'acquire');
       btnReinforce.classList.toggle('active', activeMode === 'reinforce');
       btnUndermine.classList.toggle('active', activeMode === 'undermine');
+      btnAcquire.setAttribute('aria-pressed', activeMode === 'acquire' ? 'true' : 'false');
       btnReinforce.setAttribute('aria-pressed', activeMode === 'reinforce' ? 'true' : 'false');
       btnUndermine.setAttribute('aria-pressed', activeMode === 'undermine' ? 'true' : 'false');
-      calculate();
     }
 
+    function setMode(mode) {
+      if (mode === 'acquire') {
+        activeMode = 'acquire';
+      } else {
+        // Clicking an already-active Reinforce/Undermine returns to the Acquire baseline
+        activeMode = (activeMode === mode) ? 'acquire' : mode;
+      }
+      updateModeButtons();
+      updateStateRowVisibility();
+      if (stateSelect.value && statePct.value !== '') {
+        applyState(); // recomputes the goal from state fields (applyState calls calculate() itself)
+      } else {
+        calculate();
+      }
+    }
+
+    btnAcquire.addEventListener('click', function() { setMode('acquire'); });
     btnReinforce.addEventListener('click', function() { setMode('reinforce'); });
     btnUndermine.addEventListener('click', function() { setMode('undermine'); });
 
@@ -1835,16 +2106,16 @@
       }
       if (params.has('state'))  document.getElementById('stateSelect').value = params.get('state');
       if (params.has('pct'))    document.getElementById('statePct').value    = params.get('pct');
+      if (params.has('fstate')) document.getElementById('fromStateSelect').value = params.get('fstate');
+      if (params.has('fpct'))   document.getElementById('fromStatePct').value    = params.get('fpct');
       if (params.has('cmdrs'))  document.getElementById('numCmdrs').value    = params.get('cmdrs');
 
       if (params.has('mode')) {
         var mode = params.get('mode');
-        if (mode === 'reinforce' || mode === 'undermine') {
+        if (mode === 'acquire' || mode === 'reinforce' || mode === 'undermine') {
           activeMode = mode;
-          btnReinforce.classList.toggle('active', activeMode === 'reinforce');
-          btnUndermine.classList.toggle('active', activeMode === 'undermine');
-          btnReinforce.setAttribute('aria-pressed', activeMode === 'reinforce' ? 'true' : 'false');
-          btnUndermine.setAttribute('aria-pressed', activeMode === 'undermine' ? 'true' : 'false');
+          updateModeButtons();
+          updateStateRowVisibility();
         }
       }
 
@@ -1852,6 +2123,8 @@
       if (params.has('ma'))   document.getElementById('meritAssociation').value = params.get('ma');
       if (params.has('mr'))   document.getElementById('meritResearch').value    = params.get('mr');
       if (params.has('mcom')) document.getElementById('meritCommodity').value   = params.get('mcom');
+      if (params.has('minj')) document.getElementById('meritInjection').value   = params.get('minj');
+      if (params.has('mtrk')) document.getElementById('meritTracker').value     = params.get('mtrk');
 
       // Note: ic/ia/ip/ir/ii/icom (personal inventory) are intentionally NOT read
       // from share links, even if an older link happens to include them — a shared
@@ -1873,11 +2146,26 @@
       document.getElementById('meritAssociation').value = DEFAULTS.association;
       document.getElementById('meritResearch').value    = DEFAULTS.research;
       document.getElementById('meritCommodity').value   = DEFAULTS.commodity;
+      document.getElementById('meritInjection').value   = DEFAULTS.injection;
+      document.getElementById('meritTracker').value     = DEFAULTS.tracker;
 
       document.getElementById('reinforceBadge').textContent =
         '\u2212' + Math.round((1 - CONFIG.reinforceMultiplier) * 100) + '%';
       document.getElementById('undermineBadge').textContent =
         '+' + Math.round((CONFIG.undermineMultiplier - 1) * 100) + '%';
+
+      var acquireMod = CONFIG.acquireMultiplier || 1;
+      var acquireBadge = document.getElementById('acquireBadge');
+      if (acquireMod === 1) {
+        acquireBadge.textContent = '?';
+        acquireBadge.title = 'Acquire is known to have some bonus — exact value not yet confirmed';
+      } else {
+        var acquirePct = Math.round((acquireMod - 1) * 100);
+        acquireBadge.textContent = (acquirePct >= 0 ? '+' : '') + acquirePct + '%';
+      }
+
+      updateModeButtons(); // reflect the 'acquire' default even before any saved state loads
+      updateStateRowVisibility();
 
       // Load saved options if they exist
       try {
@@ -1895,19 +2183,22 @@
           if (savedOpts.controlScore !== undefined) document.getElementById('controlScore').value = savedOpts.controlScore;
           if (savedOpts.stateSelect !== undefined) document.getElementById('stateSelect').value = savedOpts.stateSelect;
           if (savedOpts.statePct !== undefined) document.getElementById('statePct').value = savedOpts.statePct;
+          if (savedOpts.fromStateSelect !== undefined) document.getElementById('fromStateSelect').value = savedOpts.fromStateSelect;
+          if (savedOpts.fromStatePct !== undefined) document.getElementById('fromStatePct').value = savedOpts.fromStatePct;
           if (savedOpts.numCmdrs !== undefined) document.getElementById('numCmdrs').value = savedOpts.numCmdrs;
-          if (savedOpts.activeMode !== undefined && savedOpts.activeMode !== null) {
-            activeMode = savedOpts.activeMode;
-            var btnReinforce = document.getElementById('btnReinforce');
-            var btnUndermine = document.getElementById('btnUndermine');
-            btnReinforce.classList.toggle('active', activeMode === 'reinforce');
-            btnUndermine.classList.toggle('active', activeMode === 'undermine');
-            btnReinforce.setAttribute('aria-pressed', activeMode === 'reinforce' ? 'true' : 'false');
-            btnUndermine.setAttribute('aria-pressed', activeMode === 'undermine' ? 'true' : 'false');
-          }
+          // Older saves may have activeMode === null (back when "no mode" meant
+          // neutral) — treat that the same as the new explicit 'acquire' default.
+          activeMode = (savedOpts.activeMode === 'reinforce' || savedOpts.activeMode === 'undermine')
+            ? savedOpts.activeMode
+            : 'acquire';
+          updateModeButtons();
+          updateStateRowVisibility();
+
           if (savedOpts.meritClassified !== undefined) document.getElementById('meritClassified').value = savedOpts.meritClassified;
           if (savedOpts.meritAssociation !== undefined) document.getElementById('meritAssociation').value = savedOpts.meritAssociation;
           if (savedOpts.meritResearch !== undefined) document.getElementById('meritResearch').value = savedOpts.meritResearch;
+          if (savedOpts.meritInjection !== undefined) document.getElementById('meritInjection').value = savedOpts.meritInjection;
+          if (savedOpts.meritTracker !== undefined) document.getElementById('meritTracker').value = savedOpts.meritTracker;
           if (savedOpts.meritCommodity !== undefined) {
             // KNOWN_STALE_DEFAULTS: previous CONFIG defaults that turned out to be
             // wrong and were corrected. If someone's saved value exactly matches an
@@ -1923,7 +2214,7 @@
             }
           }
 
-          if (savedOpts.stateSelect || savedOpts.statePct) {
+          if (savedOpts.stateSelect || savedOpts.statePct || savedOpts.fromStateSelect || savedOpts.fromStatePct) {
             applyState();
           }
         }
@@ -1939,6 +2230,8 @@
           if (savedInv.research !== undefined) document.getElementById('invResearch').value = savedInv.research;
           if (savedInv.industrial !== undefined) document.getElementById('invIndustrial').value = savedInv.industrial;
           if (savedInv.commodity !== undefined) document.getElementById('invCommodity').value = savedInv.commodity;
+          if (savedInv.injection !== undefined) document.getElementById('invInjection').value = savedInv.injection;
+          if (savedInv.tracker !== undefined) document.getElementById('invTracker').value = savedInv.tracker;
         }
       } catch (e) {}
 
