@@ -1,1 +1,21 @@
+Alrai Sector CB-O a6-3
+Alrai Sector DB-O a6-3
+Alrai Sector FW-W c1-25
+Alrai Sector HH-M a7-1
+Alrai Sector HH-V b2-1
+Alrai Sector HH-V b2-7
+Alrai Sector IR-W c1-29
+Alrai Sector LS-T b3-7
+Alrai Sector LX-U c2-35
+Alrai Sector OY-R b4-1
+Alrai Sector PT-R b4-8
+Col 285 Sector AA-F a41-0
+Col 285 Sector AA-F a41-1
+Col 285 Sector LY-H c10-33
+Col 285 Sector OE-G c11-13
+Col 285 Sector PV-R b19-4
 Col 285 Sector SB-Q b20-8
+Col 285 Sector WH-O b21-6
+HR 7253
+HIP 90618
+LTT 15820

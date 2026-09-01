@@ -1,3 +1,12 @@
+--- System Ownership Report (Blacklist) ---
+
+## Bastogne Private Security Firm
+Mvubandowag
+Jakab
+
+## Dark Morning Initiative
+Sui Xenates
+
 ## Diamond Frogs
 Kadu mist
 
@@ -6,7 +15,6 @@ Akba Atacab
 Arawegali
 Baltalfi
 Cerremayeb
-HIP 90618
 HIP 91868
 Jian Yu
 Jingones
@@ -17,34 +25,15 @@ Tati
 Tigura
 Xi Wanja
 
-## Bastogne Private Security Firm
-Mvubandowag
-
-## Pixel Bandits Security Force
-Oleleuts
-
-## Zinra Corporation
-HR 6950
-Owionenseno
-
-## Corsaires Du Lys (unsure)
-Alrai Sector PT-R b4-8
-
-## Dark Morning Initiative
-LTT 15820
-Sui Xenates
-
-## Galactic Outcasts
-Col 285 Sector CY-N b21-0
 
 ## German Pilot Lounge
+Cuagsa
 Hariti
 Korazotz
 LP 634-24
 LTT 7979
 Negidals
 Pemoten
-Cuagsa
 
 ## Interstellar Proletarian Vanguard
 Pardal
@@ -52,15 +41,14 @@ Pardal
 ## Open Pilot's Initiative
 BD+07 4267
 
+## Pixel Bandits Security Force
+Oleleuts
+
 ## Sap Core Legion
 Audusiani
 
 ## Social Eleu Progressive Party
 BD+01 3574
 
-## Pixel Bandits Security Force
-Oleleuts
-
 ## Zinra Corporation
 HR 6950
-Owionenseno
