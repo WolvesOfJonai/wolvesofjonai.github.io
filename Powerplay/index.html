@@ -831,6 +831,7 @@
   
   <div class="container">
     <h1>Data Calculator</h1>
+    <div id="cycleCountdown" style="text-align: center; font-size: 0.75rem; color: var(--accent-color); font-weight: bold; margin-top: -8px; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.05em;"></div>
     <div class="top-actions-row" style="display: flex; align-items: center; gap: 6px; justify-content: center; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 16px; padding-bottom: 2px;">
       Hover over the buttons below to find out what they do or click Guide.
     </div>
@@ -857,8 +858,8 @@
         </div>
       </div>
       <div class="input-group" style="flex: 1; margin-bottom: 0;">
-        <label for="controlScore">System Control Score:</label>
-        <input type="text" inputmode="numeric" id="controlScore" value="" placeholder="Enter system control score">
+        <label for="controlScore">Control Score Target:</label>
+        <input type="text" inputmode="numeric" id="controlScore" value="" placeholder="Enter control score target">
       </div>
     </div>
 
@@ -1657,22 +1658,15 @@
     // 300,000-wide Fortified band on top of that.
     var TIER_ORDER = ['exploited', 'fortified', 'stronghold'];
 
-    function tierBand(tierKey) {
-      var idx = TIER_ORDER.indexOf(tierKey);
-      var start = idx > 0 ? TIERS[TIER_ORDER[idx - 1]].max : 0;
-      var end = TIERS[tierKey].max;
-      return { start: start, end: end, width: end - start };
-    }
+    
 
     function scoreForState(tier, pct) {
       var t = TIERS[tier];
-      var band = tierBand(tier);
-      // Negative % is allowed — it represents dipping below this tier's own
-      // floor (e.g. "Fortified -10%" lands inside Exploited's range), useful
-      // when undermining a system back down past where its current tier starts.
-      pct = Math.min(100, Math.max(-100, pct));
-      var score = Math.round(band.start + (pct / 100) * band.width);
-      return { score: score, pct: pct, tier: t, band: band };
+      // In Elite Dangerous, the UI displays percentage as Total Score / Tier Max.
+      // It is not a percentage of the band between tiers.
+      // We also do not clamp pct to 100% since systems can be over-fortified (e.g. 121.2%).
+      var score = Math.round((pct / 100) * t.max);
+      return { score: score, pct: pct, tier: t };
     }
 
     function applyState() {
@@ -2302,6 +2296,37 @@
           init();
         });
     }
+
+    function updateCycleCountdown() {
+      var now = new Date();
+      // Powerplay cycle resets Thursday at 07:00 UTC
+      var day = now.getUTCDay(); // Sunday = 0, Thursday = 4
+      var hours = now.getUTCHours();
+      var mins = now.getUTCMinutes();
+      
+      var daysToNextThurs = (4 - day + 7) % 7;
+      if (daysToNextThurs === 0 && (hours > 7 || (hours === 7 && mins >= 0))) {
+        daysToNextThurs = 7;
+      }
+      
+      var nextThurs = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + daysToNextThurs, 7, 0, 0));
+      var diffMs = nextThurs - now;
+      
+      var diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      var diffHrs = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      var diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+      
+      var timeStr = '';
+      if (diffDays > 0) timeStr += diffDays + 'd ';
+      if (diffHrs > 0 || diffDays > 0) timeStr += diffHrs + 'h ';
+      timeStr += diffMins + 'm';
+      
+      var cdEl = document.getElementById('cycleCountdown');
+      if (cdEl) cdEl.textContent = '⏱ Cycle ends in: ' + timeStr;
+    }
+    
+    updateCycleCountdown();
+    setInterval(updateCycleCountdown, 60000);
 
     bootstrap();
   </script>
