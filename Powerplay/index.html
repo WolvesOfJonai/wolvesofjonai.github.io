@@ -881,7 +881,7 @@
           <div class="state-pct-wrap">
             <label for="fromStatePct">Progress</label>
             <div class="pct-wrap-inner">
-              <input type="number" id="fromStatePct" min="-100" max="100" step="1" placeholder="0">
+              <input type="number" id="fromStatePct" min="-100" step="1" placeholder="0">
               <span class="pct-symbol">%</span>
             </div>
           </div>
@@ -906,7 +906,7 @@
           <div class="state-pct-wrap">
             <label for="statePct">Progress</label>
             <div class="pct-wrap-inner">
-              <input type="number" id="statePct" min="-100" max="100" step="1" placeholder="0">
+              <input type="number" id="statePct" min="-100" step="1" placeholder="0">
               <span class="pct-symbol">%</span>
             </div>
           </div>
@@ -1658,14 +1658,26 @@
     // 300,000-wide Fortified band on top of that.
     var TIER_ORDER = ['exploited', 'fortified', 'stronghold'];
 
-    
+    // Returns the score at which `tier` begins — i.e. the previous tier's
+    // max. Exploited starts at 0; Fortified starts at Exploited's max
+    // (350,000); Stronghold starts at Fortified's max (650,000).
+    function tierFloor(tier) {
+      var idx = TIER_ORDER.indexOf(tier);
+      if (idx <= 0) return 0;
+      return TIERS[TIER_ORDER[idx - 1]].max;
+    }
 
     function scoreForState(tier, pct) {
       var t = TIERS[tier];
-      // In Elite Dangerous, the UI displays percentage as Total Score / Tier Max.
-      // It is not a percentage of the band between tiers.
-      // We also do not clamp pct to 100% since systems can be over-fortified (e.g. 121.2%).
-      var score = Math.round((pct / 100) * t.max);
+      var floor = tierFloor(tier);
+      var bandWidth = t.max - floor;
+      // Percentage is relative to this tier's own band (its max minus the
+      // previous tier's max), not the tier's max in isolation — tiers are
+      // cumulative, so e.g. "Stronghold 10%" means 10% of the way through
+      // the Stronghold band, on top of already having banked the full
+      // Fortified total (650,000). We also do not clamp pct to 100% since
+      // systems can be over-ranked within a tier (e.g. Fortified 121.2%).
+      var score = Math.round(floor + (pct / 100) * bandWidth);
       return { score: score, pct: pct, tier: t };
     }
 
@@ -2235,7 +2247,12 @@
             // old default (meaning they never customized it — the page just cached
             // whatever the default was at the time), silently carry them forward to
             // the current default instead of freezing them on the outdated number.
-            var KNOWN_STALE_COMMODITY_DEFAULTS = [82];
+            // IMPORTANT: 82 was listed here previously, but as of the current
+            // config.json it IS the live default — do not list the current default
+            // here, or the next time it's changed everyone's legitimately-saved 82
+            // will get silently overwritten. Add the *old* value here only after
+            // config.json's commodity default actually changes again.
+            var KNOWN_STALE_COMMODITY_DEFAULTS = [];
             var savedCommodity = parseInt(savedOpts.meritCommodity, 10);
             if (KNOWN_STALE_COMMODITY_DEFAULTS.indexOf(savedCommodity) !== -1) {
               document.getElementById('meritCommodity').value = DEFAULTS.commodity;
