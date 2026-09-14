@@ -34,6 +34,7 @@ Col 285 Sector ID-I c10-6
 Col 285 Sector KY-H c10-20
 Comana
 Cupis
+Dagudi
 Decamandak
 Deneb el Okab
 Dhanchu
